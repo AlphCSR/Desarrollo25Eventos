@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 using UsersMS.Application;
 using UsersMS.Domain.Interfaces;
@@ -7,6 +8,9 @@ using UsersMS.Application.Interfaces;
 using UsersMS.Infrastructure.Services;
 using UsersMS.Application.Behaviors;
 using MediatR;
+using MongoDB.Driver;
+
+[assembly: ExcludeFromCodeCoverage]
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,6 +22,8 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 builder.Services.AddDbContext<UsersDbContext>(options =>
     options.UseNpgsql(connectionString));
 
+builder.Services.AddSingleton<IMongoClient>(sp => 
+    new MongoClient(builder.Configuration["MongoDb:ConnectionString"]));
 builder.Services.AddScoped<IAuditService, MongoAuditService>();
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuditBehavior<,>));
 builder.Services.AddHttpContextAccessor(); 

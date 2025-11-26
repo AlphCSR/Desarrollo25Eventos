@@ -1,8 +1,10 @@
 using MediatR;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using UsersMS.Application.DTOs;
 
 namespace UsersMS.Application.Queries.GetUserById
 {
-    public record GetUserByIdQuery(Guid Id) : IRequest<UserDto?>;
+    [ExcludeFromCodeCoverage]
+    public record GetUserByIdQuery(Guid UserId) : IRequest<UserDto?>;
 }

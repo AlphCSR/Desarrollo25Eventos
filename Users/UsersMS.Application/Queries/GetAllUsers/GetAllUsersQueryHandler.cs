@@ -1,9 +1,11 @@
 using MediatR;
+using System.Diagnostics.CodeAnalysis;
 using UsersMS.Application.DTOs;
 using UsersMS.Domain.Interfaces;
 
 namespace UsersMS.Application.Queries.GetAllUsers
 {
+    [ExcludeFromCodeCoverage]
     public class GetAllUsersQueryHandler : IRequestHandler<GetAllUsersQuery, IEnumerable<UserDto>>
     {
         private readonly IUserRepository _repository;

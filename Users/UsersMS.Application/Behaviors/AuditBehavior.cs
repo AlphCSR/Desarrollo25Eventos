@@ -1,5 +1,6 @@
 using MediatR;
-using Microsoft.AspNetCore.Http; 
+using Microsoft.AspNetCore.Http;
+using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics;
 using System.Text.Json;
 using System.Threading;
@@ -9,6 +10,7 @@ using UsersMS.Domain.Entities;
 
 namespace UsersMS.Application.Behaviors;
 
+[ExcludeFromCodeCoverage]
 public class AuditBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {

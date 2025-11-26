@@ -23,9 +23,8 @@ public class MongoAuditService : IAuditService
         }
     }
 
-    public MongoAuditService(IConfiguration config)
+    public MongoAuditService(IMongoClient client, IConfiguration config)
     {
-        var client = new MongoClient(config["MongoDb:ConnectionString"]);
         var database = client.GetDatabase(config["MongoDb:DatabaseName"]);
         _collection = database.GetCollection<AuditLog>("AuditLogs");
     }

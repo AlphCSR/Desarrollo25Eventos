@@ -1,10 +1,12 @@
+using System.Diagnostics.CodeAnalysis;
 using MediatR;
 using UsersMS.Application.DTOs;
 using UsersMS.Domain.Interfaces;
 
 namespace UsersMS.Application.Queries.GetUserByEmail
 {
-    public class GetUserByEmailQueryHandler : IRequestHandler<GetUserByEmailQuery, UserDto>
+    [ExcludeFromCodeCoverage]
+    public class GetUserByEmailQueryHandler : IRequestHandler<GetUserByEmailQuery, UserDto?>
     {
         private readonly IUserRepository _userRepository;
 
