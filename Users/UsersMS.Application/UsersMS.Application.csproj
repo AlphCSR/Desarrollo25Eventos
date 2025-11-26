@@ -3,6 +3,9 @@
   <ItemGroup>
     <ProjectReference Include="..\UsersMS.Domain\UsersMS.Domain.csproj" />
     <ProjectReference Include="..\UsersMS.Shared\UsersMS.Shared.csproj" />
+    <PackageReference Include="MediatR" Version="12.4.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
   </ItemGroup>
 
   <PropertyGroup>
