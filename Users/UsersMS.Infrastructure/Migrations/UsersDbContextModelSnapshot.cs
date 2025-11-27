@@ -5,12 +5,14 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UsersMS.Infrastructure.Persistence;
+using System.Diagnostics.CodeAnalysis;
 
 #nullable disable
 
 namespace UsersMS.Infrastructure.Migrations
 {
     [DbContext(typeof(UsersDbContext))]
+    [ExcludeFromCodeCoverage]
     partial class UsersDbContextModelSnapshot : ModelSnapshot
     {
         protected override void BuildModel(ModelBuilder modelBuilder)

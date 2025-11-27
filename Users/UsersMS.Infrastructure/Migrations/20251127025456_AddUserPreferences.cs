@@ -1,10 +1,13 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
+using System.Diagnostics.CodeAnalysis;
+
 #nullable disable
 
 namespace UsersMS.Infrastructure.Migrations
 {
     /// <inheritdoc />
+    [ExcludeFromCodeCoverage]
     public partial class AddUserPreferences : Migration
     {
         /// <inheritdoc />

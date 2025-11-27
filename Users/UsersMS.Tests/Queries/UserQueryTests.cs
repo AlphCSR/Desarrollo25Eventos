@@ -47,16 +47,15 @@ namespace UsersMS.Tests.Queries
             result.Should().Contain(u => u.Email == "u2@test.com");
         }
 
-        [Fact]
-        public async Task GetUserById_ShouldReturnUser_WhenUserExists()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task GetUserById_ShouldReturnExpectedResult(bool userExists)
         {
             // Arrange
             var userId = Guid.NewGuid();
-            var user = new User("User 1", "u1@test.com", "kc-1", UserRole.User);
-            // Force ID to match (User ID is set in constructor but we can't set it directly easily without reflection or if it's protected set)
-            // Actually User constructor generates a new ID. We should mock the repo to return this user when asked for *any* ID or the specific one.
-            // But wait, the DTO returns the ID from the user object.
-            
+            var user = userExists ? new User("User 1", "u1@test.com", "kc-1", UserRole.User) : null;
+
             _userRepositoryMock.Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(user);
 
@@ -66,63 +65,44 @@ namespace UsersMS.Tests.Queries
             var result = await handler.Handle(new GetUserByIdQuery(userId), CancellationToken.None);
 
             // Assert
-            result.Should().NotBeNull();
-            result!.Email.Should().Be("u1@test.com");
+            if (userExists)
+            {
+                result.Should().NotBeNull();
+                result!.Email.Should().Be("u1@test.com");
+            }
+            else
+            {
+                result.Should().BeNull();
+            }
         }
 
-        [Fact]
-        public async Task GetUserById_ShouldReturnNull_WhenUserDoesNotExist()
+        [Theory]
+        [InlineData(true)]
+        [InlineData(false)]
+        public async Task GetUserByEmail_ShouldReturnExpectedResult(bool userExists)
         {
             // Arrange
-            var userId = Guid.NewGuid();
-            _userRepositoryMock.Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
-                .ReturnsAsync((User?)null);
-
-            var handler = new GetUserByIdQueryHandler(_userRepositoryMock.Object);
-
-            // Act
-            var result = await handler.Handle(new GetUserByIdQuery(userId), CancellationToken.None);
-
-            // Assert
-            result.Should().BeNull();
-        }
-
-        [Fact]
-        public async Task GetUserByEmail_ShouldReturnUser_WhenUserExists()
-        {
-            // Arrange
-            var email = "u1@test.com";
-            var user = new User("User 1", email, "kc-1", UserRole.User);
+            var email = userExists ? "u1@test.com" : "unknown@test.com";
+            var user = userExists ? new User("User 1", email, "kc-1", UserRole.User) : null;
             
             _userRepositoryMock.Setup(x => x.GetByEmailAsync(email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(user);
 
             var handler = new GetUserByEmailQueryHandler(_userRepositoryMock.Object);
 
-            // Act
-            var result = await handler.Handle(new GetUserByEmailQuery(email), CancellationToken.None);
-
-            // Assert
-            result.Should().NotBeNull();
-            result!.Email.Should().Be(email);
-        }
-
-        [Fact]
-        public async Task GetUserByEmail_ShouldThrowUserNotFoundException_WhenUserDoesNotExist()
-        {
-            // Arrange
-            var email = "unknown@test.com";
-            _userRepositoryMock.Setup(x => x.GetByEmailAsync(email, It.IsAny<CancellationToken>()))
-                .ReturnsAsync((User?)null);
-
-            var handler = new GetUserByEmailQueryHandler(_userRepositoryMock.Object);
-
-            // Act
-            Func<Task> act = async () => await handler.Handle(new GetUserByEmailQuery(email), CancellationToken.None);
-
-            // Assert
-            await act.Should().ThrowAsync<UserNotFoundException>()
-                .WithMessage("User not found");
+            // Act & Assert
+            if (userExists)
+            {
+                var result = await handler.Handle(new GetUserByEmailQuery(email), CancellationToken.None);
+                result.Should().NotBeNull();
+                result!.Email.Should().Be(email);
+            }
+            else
+            {
+                Func<Task> act = async () => await handler.Handle(new GetUserByEmailQuery(email), CancellationToken.None);
+                await act.Should().ThrowAsync<UserNotFoundException>()
+                    .WithMessage("User not found");
+            }
         }
     }
 }

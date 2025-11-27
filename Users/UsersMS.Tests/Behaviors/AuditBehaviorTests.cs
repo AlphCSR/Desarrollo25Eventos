@@ -90,6 +90,25 @@ namespace UsersMS.Tests.Behaviors
         }
 
         [Fact]
+        public async Task Handle_ShouldUseAnonymousUser_WhenUserPrincipalHasNoSubClaim()
+        {
+            // Arrange
+            var command = new TestCommand();
+            var context = new DefaultHttpContext();
+            var identity = new ClaimsIdentity(); // No claims
+            context.User = new ClaimsPrincipal(identity);
+            _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(context);
+
+            RequestHandlerDelegate<string> next = () => Task.FromResult("Success");
+
+            // Act
+            await _behavior.Handle(command, next, CancellationToken.None);
+
+            // Assert
+            _auditServiceMock.Verify(x => x.LogAsync(It.Is<AuditLog>(l => l.UserId == "Anonymous")), Times.Once);
+        }
+
+        [Fact]
         public async Task Handle_ShouldNotLog_WhenRequestIsNotCommand()
         {
             // Arrange
