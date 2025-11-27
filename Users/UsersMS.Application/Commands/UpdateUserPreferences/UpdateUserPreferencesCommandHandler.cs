@@ -5,10 +5,13 @@ using System.Threading.Tasks;
 using UsersMS.Application.Commands;
 using UsersMS.Domain.Interfaces;
 using UsersMS.Domain.Exceptions;
-using UsersMS.Domain.Entities; // Added for UserHistory
+using UsersMS.Domain.Entities; 
 
 namespace UsersMS.Application.Commands.UpdateUserPreferences
 {
+    /// <summary>
+    /// Manejador para el comando de actualización de preferencias de usuario.
+    /// </summary>
     public class UpdateUserPreferencesCommandHandler : IRequestHandler<UpdateUserPreferencesCommand>
     {
         private readonly IUserRepository _userRepository;
@@ -18,18 +21,26 @@ namespace UsersMS.Application.Commands.UpdateUserPreferences
             _userRepository = userRepository;
         }
 
+        /// <summary>
+        /// Maneja la actualización de preferencias de usuario.
+        /// </summary>
+        /// <param name="request">Comando de actualización de preferencias.</param>
+        /// <param name="cancellationToken">Token de cancelación.</param>
         public async Task Handle(UpdateUserPreferencesCommand request, CancellationToken cancellationToken)
         {
+            //1. Buscar el usuario
             var user = await _userRepository.GetByIdAsync(request.UserId, cancellationToken);
             
+            //2. Validar que el usuario exista
             if (user == null) 
                 throw new UserNotFoundException($"Usuario con ID {request.UserId} no encontrado.");
 
-            // Actualizar Dominio
+            //3. Actualizar preferencias
             var oldPrefs = string.Join(", ", user.Preferences);
             user.UpdatePreferences(request.Data.Preferences);
             var newPrefs = string.Join(", ", user.Preferences);
 
+            //4. Generar historial
             if (oldPrefs != newPrefs)
             {
                 var history = new UserHistory(
@@ -40,8 +51,7 @@ namespace UsersMS.Application.Commands.UpdateUserPreferences
                 await _userRepository.AddHistoryAsync(history, cancellationToken);
             }
 
-            // Guardar (El repositorio maneja el ChangeTracking)
-            // await _userRepository.UpdateAsync(user, cancellationToken); // REMOVED to avoid concurrency exception
+            //5. Guardar cambios
             await _userRepository.SaveChangesAsync(cancellationToken);
         }
     }

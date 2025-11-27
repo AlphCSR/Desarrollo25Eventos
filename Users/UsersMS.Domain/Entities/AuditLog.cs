@@ -2,6 +2,9 @@ using System;
 
 namespace UsersMS.Domain.Entities 
 {
+    /// <summary>
+    /// Registro de auditoría para operaciones del sistema.
+    /// </summary>
     public class AuditLog
     {
         public Guid Id { get; set; } = Guid.NewGuid();

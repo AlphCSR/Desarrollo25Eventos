@@ -11,6 +11,7 @@ using UsersMS.Application.DTOs;
 using UsersMS.Application.Interfaces;
 using UsersMS.Domain.Entities;
 using UsersMS.Domain.Interfaces;
+using UsersMS.Domain.Exceptions;
 using UsersMS.Shared.Enums;
 using System.Collections.Generic;
 
@@ -98,7 +99,7 @@ namespace UsersMS.Tests.Handlers
                 "Fail_DuplicateEmail",
                 new CreateUserDto("Pedro Dup", "existe@test.com", "123456", UserRole.User),
                 new User("Old User", "existe@test.com", "k-id", UserRole.User),
-                typeof(InvalidOperationException),
+                typeof(UserAlreadyExistsException),
                 "ya existe"
             };
         }
@@ -167,7 +168,7 @@ namespace UsersMS.Tests.Handlers
                 "Fail_UserNotFound",
                 Guid.NewGuid(),
                 new UpdateUserDto("Nuevo Nombre"),
-                typeof(KeyNotFoundException)
+                typeof(UserNotFoundException)
             };
         }
 
@@ -225,7 +226,7 @@ namespace UsersMS.Tests.Handlers
 
         public static IEnumerable<object?[]> GetDeleteUserFailureScenarios()
         {
-            yield return new object?[] { "Fail_NotFound", Guid.NewGuid(), typeof(KeyNotFoundException) };
+            yield return new object?[] { "Fail_NotFound", Guid.NewGuid(), typeof(UserNotFoundException) };
         }
     }
 }

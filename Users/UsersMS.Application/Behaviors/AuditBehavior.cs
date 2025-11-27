@@ -10,6 +10,9 @@ using UsersMS.Domain.Entities;
 
 namespace UsersMS.Application.Behaviors;
 
+/// <summary>
+/// Comportamiento de auditoría para mediatr.
+/// </summary>
 [ExcludeFromCodeCoverage]
 public class AuditBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
@@ -23,6 +26,13 @@ public class AuditBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TR
         _httpContextAccessor = httpContextAccessor;
     }
 
+    /// <summary>
+    /// Maneja la auditoría de los comandos.
+    /// </summary>
+    /// <param name="request">El comando a ejecutar.</param>
+    /// <param name="next">El delegado del siguiente handler.</param>
+    /// <param name="cancellationToken">El token de cancelación.</param>
+    /// <returns>El resultado del comando.</returns>
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();

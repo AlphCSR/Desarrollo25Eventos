@@ -9,9 +9,13 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json.Linq;
 using UsersMS.Application.Interfaces;
+using UsersMS.Domain.Exceptions;
 
 namespace UsersMS.Infrastructure.Services
 {
+    /// <summary>
+    /// Servicio para interactuar con la API de Keycloak.
+    /// </summary>
     public class KeycloakService : IKeycloakService
     {
         private readonly HttpClient _httpClient;
@@ -23,6 +27,16 @@ namespace UsersMS.Infrastructure.Services
             _configuration = configuration;
         }
 
+        /// <summary>
+        /// Registra un nuevo usuario en Keycloak.
+        /// </summary>
+        /// <param name="email">Email del usuario.</param>
+        /// <param name="password">Contraseña del usuario.</param>
+        /// <param name="firstName">Nombre del usuario.</param>
+        /// <param name="lastName">Apellido del usuario.</param>
+        /// <param name="cancellationToken">Token de cancelación.</param>
+        /// <returns>ID del usuario creado en Keycloak.</returns>
+        /// <exception cref="KeycloakIntegrationException">Lanzada si ocurre un error en la integración con Keycloak.</exception>
         public async Task<string> RegisterUserAsync(string email, string password, string firstName, string lastName, CancellationToken cancellationToken)
         {
             // 1. Obtener Token de Administrador
@@ -50,12 +64,12 @@ namespace UsersMS.Infrastructure.Services
             if (!response.IsSuccessStatusCode)
             {
                 var error = await response.Content.ReadAsStringAsync(cancellationToken);
-                throw new InvalidOperationException($"Error al crear usuario en Keycloak: {error}");
+                throw new KeycloakIntegrationException($"Error al crear usuario en Keycloak: {error}");
             }
 
             // 4. Obtener el ID del usuario recién creado (Keycloak retorna Location header)
             var locationHeader = response.Headers.Location;
-            if (locationHeader == null) throw new Exception("Keycloak no devolvió la ubicación del usuario creado.");
+            if (locationHeader == null) throw new KeycloakIntegrationException("Keycloak no devolvió la ubicación del usuario creado.");
 
             // El ID es la última parte de la URL
             var pathSegments = locationHeader.ToString().Split('/');
@@ -64,23 +78,34 @@ namespace UsersMS.Infrastructure.Services
 
         private async Task<string> GetAdminAccessTokenAsync(CancellationToken cancellationToken)
         {
+            // 1. Obtener token de administrador    
             var tokenUrl = $"{_configuration["Keycloak:AuthServerUrl"]}/realms/{_configuration["Keycloak:Realm"]}/protocol/openid-connect/token";
             
+            // 2. Preparar payload de autenticación
             var requestContent = new FormUrlEncodedContent(new[]
             {
-                new KeyValuePair<string, string>("client_id", _configuration["Keycloak:ClientId"]),
-                new KeyValuePair<string, string>("client_secret", _configuration["Keycloak:ClientSecret"]),
+                new KeyValuePair<string, string>("client_id", _configuration["Keycloak:ClientId"] ?? throw new KeycloakIntegrationException("No se pudo obtener el token de admin.")),
+                new KeyValuePair<string, string>("client_secret", _configuration["Keycloak:ClientSecret"] ?? throw new KeycloakIntegrationException("No se pudo obtener el token de admin.")),
                 new KeyValuePair<string, string>("grant_type", "client_credentials")
             });
 
+            // 3. Enviar petición de autenticación
             var response = await _httpClient.PostAsync(tokenUrl, requestContent, cancellationToken);
             response.EnsureSuccessStatusCode();
 
+            // 4. Obtener el token de administrador
             var content = await response.Content.ReadAsStringAsync(cancellationToken);
             var json = JObject.Parse(content);
-            return json["access_token"]?.ToString() ?? throw new Exception("No se pudo obtener el token de admin.");
+            return json["access_token"]?.ToString() ?? throw new KeycloakIntegrationException("No se pudo obtener el token de admin.");
         }
 
+        /// <summary>
+        /// Asigna un rol a un usuario en Keycloak.
+        /// </summary>
+        /// <param name="username">Nombre de usuario (email).</param>
+        /// <param name="role">Nombre del rol a asignar.</param>
+        /// <param name="cancellationToken">Token de cancelación.</param>
+        /// <exception cref="KeycloakIntegrationException">Lanzada si ocurre un error en la integración con Keycloak.</exception>
         public async Task AssignRoleAsync(string username, string role, CancellationToken cancellationToken)
         {
             var token = await GetAdminAccessTokenAsync(cancellationToken);
@@ -93,13 +118,13 @@ namespace UsersMS.Infrastructure.Services
             if (!userSearchResponse.IsSuccessStatusCode)
             {
                 var error = await userSearchResponse.Content.ReadAsStringAsync(cancellationToken);
-                throw new Exception($"No se pudo encontrar el usuario '{username}' en Keycloak. Respuesta: {error}");
+                throw new KeycloakIntegrationException($"No se pudo encontrar el usuario '{username}' en Keycloak. Respuesta: {error}");
             }
 
             var userContent = await userSearchResponse.Content.ReadAsStringAsync(cancellationToken);
             var userArray = JsonSerializer.Deserialize<JsonElement>(userContent);
             if (userArray.GetArrayLength() == 0)
-                throw new Exception($"Usuario '{username}' no encontrado en Keycloak.");
+                throw new KeycloakIntegrationException($"Usuario '{username}' no encontrado en Keycloak.");
 
             var userId = userArray[0].GetProperty("id").GetString();
 
@@ -108,13 +133,13 @@ namespace UsersMS.Infrastructure.Services
             if (!clientResponse.IsSuccessStatusCode)
             {
                 var error = await clientResponse.Content.ReadAsStringAsync(cancellationToken);
-                throw new Exception($"No se pudo encontrar el cliente '{_configuration["Keycloak:ClientId"]}' en Keycloak. Respuesta: {error}");
+                throw new KeycloakIntegrationException($"No se pudo encontrar el cliente '{_configuration["Keycloak:ClientId"]}' en Keycloak. Respuesta: {error}");
             }
 
             var clientContent = await clientResponse.Content.ReadAsStringAsync(cancellationToken);
             var clientArray = JsonSerializer.Deserialize<JsonElement>(clientContent);
             if (clientArray.GetArrayLength() == 0)
-                throw new Exception($"Cliente '{_configuration["Keycloak:ClientId"]}' no encontrado.");
+                throw new KeycloakIntegrationException($"Cliente '{_configuration["Keycloak:ClientId"]}' no encontrado.");
 
             var clientId = clientArray[0].GetProperty("id").GetString();
 
@@ -123,7 +148,7 @@ namespace UsersMS.Infrastructure.Services
             if (!roleResponse.IsSuccessStatusCode)
             {
                 var error = await roleResponse.Content.ReadAsStringAsync(cancellationToken);
-                throw new Exception($"No se pudo encontrar el rol '{role}' en Keycloak. Respuesta: {error}");
+                throw new KeycloakIntegrationException($"No se pudo encontrar el rol '{role}' en Keycloak. Respuesta: {error}");
             }
 
             var roleContent = await roleResponse.Content.ReadAsStringAsync(cancellationToken);
@@ -143,10 +168,17 @@ namespace UsersMS.Infrastructure.Services
             if (!assignRoleResponse.IsSuccessStatusCode)
             {
                 var error = await assignRoleResponse.Content.ReadAsStringAsync(cancellationToken);
-                throw new Exception($"No se pudo asignar el rol '{role}' al usuario '{username}'. Respuesta: {error}");
+                throw new KeycloakIntegrationException($"No se pudo asignar el rol '{role}' al usuario '{username}'. Respuesta: {error}");
             }
         }
 
+        /// <summary>
+        /// Actualiza los datos de un usuario en Keycloak.
+        /// </summary>
+        /// <param name="keycloakId">ID de Keycloak del usuario.</param>
+        /// <param name="firstName">Nuevo nombre.</param>
+        /// <param name="lastName">Nuevo apellido.</param>
+        /// <param name="cancellationToken">Token de cancelación.</param>
         public async Task UpdateUserAsync(string keycloakId, string firstName, string lastName, CancellationToken cancellationToken)
         {
             var token = await GetAdminAccessTokenAsync(cancellationToken);
@@ -169,6 +201,11 @@ namespace UsersMS.Infrastructure.Services
             response.EnsureSuccessStatusCode();
         }
 
+        /// <summary>
+        /// Desactiva un usuario en Keycloak.
+        /// </summary>
+        /// <param name="keycloakId">ID de Keycloak del usuario.</param>
+        /// <param name="cancellationToken">Token de cancelación.</param>
         public async Task DeactivateUserAsync(string keycloakId, CancellationToken cancellationToken)
         {
             var token = await GetAdminAccessTokenAsync(cancellationToken);

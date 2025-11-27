@@ -10,6 +10,7 @@ using System.Net.Http.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using UsersMS.Infrastructure.Services;
+using UsersMS.Domain.Exceptions;
 using Xunit;
 
 namespace UsersMS.Tests.Infrastructure.Services
@@ -111,7 +112,7 @@ namespace UsersMS.Tests.Infrastructure.Services
             Func<Task> act = async () => await _service.RegisterUserAsync("test@example.com", "password", "First", "Last", CancellationToken.None);
 
             // Assert
-            await act.Should().ThrowAsync<InvalidOperationException>()
+            await act.Should().ThrowAsync<KeycloakIntegrationException>()
                 .WithMessage("*User already exists*");
         }
 
