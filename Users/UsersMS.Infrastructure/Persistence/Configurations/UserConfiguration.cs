@@ -19,6 +19,13 @@ namespace UsersMS.Infrastructure.Persistence.Configurations
             builder.Property(u => u.KeycloakId)
                 .IsRequired();
 
+            builder.Property(u => u.Preferences)
+                .HasConversion(
+                    v => System.Text.Json.JsonSerializer.Serialize(v, (System.Text.Json.JsonSerializerOptions)null),
+                    v => System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.List<string>>(v, (System.Text.Json.JsonSerializerOptions)null) ?? new System.Collections.Generic.List<string>()
+                )
+                .IsRequired(false);
+            
             builder.HasMany(u => u.History)
                 .WithOne()
                 .HasForeignKey(h => h.UserId)

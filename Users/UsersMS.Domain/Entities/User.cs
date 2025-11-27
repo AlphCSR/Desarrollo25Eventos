@@ -13,8 +13,9 @@ namespace UsersMS.Domain.Entities
         public string KeycloakId { get; private set; }
         public UserRole Role { get; private set; }
         public UserState State { get; private set; }
-
+        public List<string> _preferences = new();
         private readonly List<UserHistory> _history = new();
+        public IReadOnlyCollection<string> Preferences => (_preferences ?? new List<string>()).AsReadOnly();
         public IReadOnlyCollection<UserHistory> History => _history.AsReadOnly();
 
         protected User() { }
@@ -33,6 +34,23 @@ namespace UsersMS.Domain.Entities
             AddHistory("UserCreated", $"Usuario creado con rol {role}");
         }
 
+        public void UpdatePreferences(List<string> newPreferences)
+        {
+            if (newPreferences == null) 
+                throw new ArgumentException("La lista de preferencias no puede ser nula.");
+
+            // Detectar cambios para el historial
+            var oldPrefs = string.Join(", ", _preferences ?? new List<string>());
+            var newPrefs = string.Join(", ", newPreferences);
+
+            if (oldPrefs != newPrefs)
+            {
+                _preferences = newPreferences; // Reemplazamos la lista
+                UpdatedAt = DateTime.UtcNow;
+                // AddHistory moved to Handler to avoid concurrency issues
+            }
+        }
+    
         public void UpdateProfile(string newName)
         {
             if (string.IsNullOrWhiteSpace(newName)) throw new ArgumentException("El nombre no puede estar vacío.");

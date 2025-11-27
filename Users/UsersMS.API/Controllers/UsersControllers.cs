@@ -7,6 +7,8 @@ using UsersMS.Application.DTOs;
 using UsersMS.Application.Queries.GetAllUsers;
 using UsersMS.Application.Queries.GetUserById;
 using UsersMS.Application.Queries.GetUserByEmail;
+using UsersMS.Domain.Exceptions;
+using UsersMS.Application.Commands;
 
 namespace UsersMS.API.Controllers
 {
@@ -91,6 +93,25 @@ namespace UsersMS.API.Controllers
             catch (KeyNotFoundException)
             {
                 return NotFound();
+            }
+        }
+
+        [HttpPut("{id}/preferences")]
+        public async Task<IActionResult> UpdatePreferences(Guid id, [FromBody] UpdateUserPreferencesDto dto)
+        {
+            try
+            {
+                var command = new UpdateUserPreferencesCommand(id, dto);
+                await _mediator.Send(command);
+                return NoContent();
+            }
+            catch (UserNotFoundException ex)
+            {
+                return NotFound(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
     }
