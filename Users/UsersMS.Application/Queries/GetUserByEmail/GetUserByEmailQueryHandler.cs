@@ -9,7 +9,7 @@ namespace UsersMS.Application.Queries.GetUserByEmail
     /// <summary>
     /// Manejador para la consulta de usuario por email.
     /// </summary>
-    [ExcludeFromCodeCoverage]
+    // [ExcludeFromCodeCoverage]
     public class GetUserByEmailQueryHandler : IRequestHandler<GetUserByEmailQuery, UserDto?>
     {
         private readonly IUserRepository _userRepository;

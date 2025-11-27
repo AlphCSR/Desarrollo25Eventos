@@ -6,7 +6,7 @@ using UsersMS.Domain.Interfaces;
 
 namespace UsersMS.Application.Queries.GetUserById
 {
-    [ExcludeFromCodeCoverage]
+    // [ExcludeFromCodeCoverage]
     public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, UserDto?>
     {
         private readonly IUserRepository _repository;

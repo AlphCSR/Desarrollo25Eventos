@@ -13,7 +13,7 @@ namespace UsersMS.Application.Behaviors;
 /// <summary>
 /// Comportamiento de auditoría para mediatr.
 /// </summary>
-[ExcludeFromCodeCoverage]
+// [ExcludeFromCodeCoverage]
 public class AuditBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
