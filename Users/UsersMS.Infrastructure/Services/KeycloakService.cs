@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Text;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
@@ -78,6 +79,72 @@ namespace UsersMS.Infrastructure.Services
             var content = await response.Content.ReadAsStringAsync(cancellationToken);
             var json = JObject.Parse(content);
             return json["access_token"]?.ToString() ?? throw new Exception("No se pudo obtener el token de admin.");
+        }
+
+        public async Task AssignRoleAsync(string username, string role, CancellationToken cancellationToken)
+        {
+            var token = await GetAdminAccessTokenAsync(cancellationToken);
+            var realm = _configuration["Keycloak:Realm"];
+
+            // Paso 1: Buscar al usuario
+            var userSearchResponse = await _httpClient.GetAsync($"{_configuration["Keycloak:AuthServerUrl"]}/admin/realms/{realm}/users?username={username}", cancellationToken);
+            _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
+            if (!userSearchResponse.IsSuccessStatusCode)
+            {
+                var error = await userSearchResponse.Content.ReadAsStringAsync(cancellationToken);
+                throw new Exception($"No se pudo encontrar el usuario '{username}' en Keycloak. Respuesta: {error}");
+            }
+
+            var userContent = await userSearchResponse.Content.ReadAsStringAsync(cancellationToken);
+            var userArray = JsonSerializer.Deserialize<JsonElement>(userContent);
+            if (userArray.GetArrayLength() == 0)
+                throw new Exception($"Usuario '{username}' no encontrado en Keycloak.");
+
+            var userId = userArray[0].GetProperty("id").GetString();
+
+            // Paso 2: Buscar el cliente
+            var clientResponse = await _httpClient.GetAsync($"{_configuration["Keycloak:AuthServerUrl"]}/admin/realms/{realm}/clients?clientId={_configuration["Keycloak:ClientId"]}", cancellationToken);
+            if (!clientResponse.IsSuccessStatusCode)
+            {
+                var error = await clientResponse.Content.ReadAsStringAsync(cancellationToken);
+                throw new Exception($"No se pudo encontrar el cliente '{_configuration["Keycloak:ClientId"]}' en Keycloak. Respuesta: {error}");
+            }
+
+            var clientContent = await clientResponse.Content.ReadAsStringAsync(cancellationToken);
+            var clientArray = JsonSerializer.Deserialize<JsonElement>(clientContent);
+            if (clientArray.GetArrayLength() == 0)
+                throw new Exception($"Cliente '{_configuration["Keycloak:ClientId"]}' no encontrado.");
+
+            var clientId = clientArray[0].GetProperty("id").GetString();
+
+            // Paso 3: Buscar el rol
+            var roleResponse = await _httpClient.GetAsync($"{_configuration["Keycloak:AuthServerUrl"]}/admin/realms/{realm}/clients/{clientId}/roles/{role}", cancellationToken);
+            if (!roleResponse.IsSuccessStatusCode)
+            {
+                var error = await roleResponse.Content.ReadAsStringAsync(cancellationToken);
+                throw new Exception($"No se pudo encontrar el rol '{role}' en Keycloak. Respuesta: {error}");
+            }
+
+            var roleContent = await roleResponse.Content.ReadAsStringAsync(cancellationToken);
+            var roleJson = JsonSerializer.Deserialize<JsonElement>(roleContent);
+
+            // Paso 4: Asignar el rol al usuario
+            var assignRoleRequest = new HttpRequestMessage(
+                HttpMethod.Post,
+                $"{_configuration["Keycloak:AuthServerUrl"]}/admin/realms/{realm}/users/{userId}/role-mappings/clients/{clientId}"
+            );
+
+            assignRoleRequest.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+            assignRoleRequest.Content = new StringContent(JsonSerializer.Serialize(new[] { roleJson }), Encoding.UTF8, "application/json");
+
+            var assignRoleResponse = await _httpClient.SendAsync(assignRoleRequest, cancellationToken);
+
+            if (!assignRoleResponse.IsSuccessStatusCode)
+            {
+                var error = await assignRoleResponse.Content.ReadAsStringAsync(cancellationToken);
+                throw new Exception($"No se pudo asignar el rol '{role}' al usuario '{username}'. Respuesta: {error}");
+            }
         }
 
         public async Task UpdateUserAsync(string keycloakId, string firstName, string lastName, CancellationToken cancellationToken)

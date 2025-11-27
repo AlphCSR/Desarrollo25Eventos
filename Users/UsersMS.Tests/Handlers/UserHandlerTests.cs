@@ -44,6 +44,9 @@ namespace UsersMS.Tests.Handlers
             _keycloakServiceMock.Setup(x => x.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync("keycloak-id-123");
 
+            _keycloakServiceMock.Setup(x => x.AssignRoleAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
+                .Returns(Task.CompletedTask);
+
             var handler = new CreateUserCommandHandler(_userRepositoryMock.Object, _keycloakServiceMock.Object);
             var command = new CreateUserCommand(dto);
 
@@ -54,6 +57,7 @@ namespace UsersMS.Tests.Handlers
             result.Should().NotBeEmpty();
             _userRepositoryMock.Verify(x => x.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Once);
             _keycloakServiceMock.Verify(x => x.RegisterUserAsync(dto.Email, dto.Password, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
+            _keycloakServiceMock.Verify(x => x.AssignRoleAsync(dto.Email, dto.Role.ToString(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Theory]

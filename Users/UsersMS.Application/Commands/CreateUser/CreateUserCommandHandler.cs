@@ -37,6 +37,8 @@ namespace UsersMS.Application.Commands.CreateUser
                 lastName, 
                 cancellationToken);
 
+            await _keycloakService.AssignRoleAsync(request.UserData.Email, request.UserData.Role.ToString(), cancellationToken);
+
             var newUser = new User(
                 request.UserData.FullName,
                 request.UserData.Email,
