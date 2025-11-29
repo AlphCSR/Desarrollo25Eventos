@@ -17,13 +17,8 @@ namespace UsersMS.Domain.Entities
         public string KeycloakId { get; private set; }
         public UserRole Role { get; private set; }
         public UserState State { get; private set; }
-        public List<string> _preferences = new();
+        public List<string> Preferences { get; private set; } = new();
         private readonly List<UserHistory> _history = new();
-        
-        /// <summary>
-        /// Preferencias del usuario.
-        /// </summary>
-        public IReadOnlyCollection<string> Preferences => (_preferences ?? new List<string>()).AsReadOnly();
         
         /// <summary>
         /// Historial de cambios del usuario.
@@ -65,12 +60,12 @@ namespace UsersMS.Domain.Entities
                 throw new InvalidUserDataException("La lista de preferencias no puede ser nula.");
 
             // Detectar cambios para el historial
-            var oldPrefs = string.Join(", ", _preferences ?? new List<string>());
+            var oldPrefs = string.Join(", ", Preferences ?? new List<string>());
             var newPrefs = string.Join(", ", newPreferences);
 
             if (oldPrefs != newPrefs)
             {
-                _preferences = newPreferences; // Reemplazamos la lista
+                Preferences = newPreferences; // Reemplazamos la lista
                 UpdatedAt = DateTime.UtcNow;
             }
         }

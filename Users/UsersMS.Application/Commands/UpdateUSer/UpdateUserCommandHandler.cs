@@ -50,6 +50,10 @@ namespace UsersMS.Application.Commands.UpdateUser
 
             // 4. Actualizar entidad User 
             user.UpdateProfile(request.Data.FullName);
+            if (request.Data.Preferences != null)
+            {
+                user.UpdatePreferences(request.Data.Preferences);
+            }
             
             // 5. Crear Historial 
             var history = new UserHistory(

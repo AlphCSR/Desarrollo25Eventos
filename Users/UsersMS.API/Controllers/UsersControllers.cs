@@ -9,6 +9,7 @@ using UsersMS.Application.Queries.GetUserById;
 using UsersMS.Application.Queries.GetUserByEmail;
 using UsersMS.Domain.Exceptions;
 using UsersMS.Application.Commands;
+using UsersMS.Application.Queries.GetUserHistory;
 
 namespace UsersMS.API.Controllers
 {
@@ -196,6 +197,20 @@ namespace UsersMS.API.Controllers
             {
                 return BadRequest(ex.Message);
             }
+        }
+
+        /// <summary>
+        /// Obtiene el historial de un usuario.
+        /// </summary>
+        /// <param name="id">ID del usuario.</param>
+        /// <returns>Historial del usuario.</returns>
+        [HttpGet("{id}/history")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetHistory(Guid id)
+        {
+             var result = await _mediator.Send(new GetUserHistoryQuery(id));
+             return Ok(result);
         }
     }
 }
