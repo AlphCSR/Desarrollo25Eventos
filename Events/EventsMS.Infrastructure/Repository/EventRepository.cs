@@ -40,6 +40,12 @@ namespace EventsMS.Infrastructure.Repository
                 .ToListAsync(cancellationToken);
         }
 
+        public async Task UpdateAsync(Event eventEntity, CancellationToken cancellationToken)
+        {
+            _context.Events.Update(eventEntity);
+            await Task.CompletedTask;
+        }
+
         public async Task SaveChangesAsync(CancellationToken cancellationToken)
         {
             await _context.SaveChangesAsync(cancellationToken);

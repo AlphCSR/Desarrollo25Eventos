@@ -2,8 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using EventsMS.Domain.Entities;
 using EventsMS.Infrastructure.Persistence.Configuration;
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace EventsMS.Infrastructure.Persistence
 {
+    [ExcludeFromCodeCoverage]
     public class EventsDbContext : DbContext
     {
         public EventsDbContext(DbContextOptions<EventsDbContext> options) : base(options)
