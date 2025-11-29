@@ -19,7 +19,8 @@ namespace EventsMS.Application.Queries.GetEventById
         {
             var eventEntity = await _repository.GetByIdAsync(request.Id, cancellationToken);
 
-            if (eventEntity == null) return null;
+            if (eventEntity == null) 
+                throw new Domain.Exceptions.EventNotFoundException(request.Id);
 
             return new EventDto
             {
@@ -29,7 +30,8 @@ namespace EventsMS.Application.Queries.GetEventById
                 Date = eventEntity.Date,
                 VenueName = eventEntity.VenueName,
                 ImageUrl = eventEntity.ImageUrl,
-                Status = eventEntity.Status
+                Status = eventEntity.Status,
+                Category = eventEntity.Category
             };
         }
     }

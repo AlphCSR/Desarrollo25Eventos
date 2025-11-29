@@ -29,7 +29,8 @@ namespace EventsMS.Application.Queries.GetEvents
                 Date = e.Date,
                 VenueName = e.VenueName,
                 ImageUrl = e.ImageUrl,
-                Status = e.Status
+                Status = e.Status,
+                Category = e.Category
             }).ToList();
         }
     }

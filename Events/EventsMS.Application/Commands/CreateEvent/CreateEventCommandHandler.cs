@@ -23,12 +23,23 @@ namespace EventsMS.Application.Commands.CreateEvent
 
         public async Task<Guid> Handle(CreateEventCommand request, CancellationToken cancellationToken)
         {
+            
+            if (string.IsNullOrWhiteSpace(request.EventData.Title))
+                throw new Domain.Exceptions.InvalidEventDataException("Event title cannot be empty.");
+
+            if (string.IsNullOrWhiteSpace(request.EventData.Description))
+                throw new Domain.Exceptions.InvalidEventDataException("Event description cannot be empty.");
+
+            if (request.EventData.Date <= DateTime.UtcNow)
+                throw new Domain.Exceptions.InvalidEventDataException("Event date must be in the future.");
+
             // 1. Crear el Root
             var newEvent = new Domain.Entities.Event(
                 request.EventData.Title,
                 request.EventData.Description,
                 request.EventData.Date,
-                request.EventData.VenueName
+                request.EventData.VenueName,
+                request.EventData.Category
             );
 
             if(!string.IsNullOrEmpty(request.EventData.ImageUrl))

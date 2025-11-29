@@ -22,7 +22,7 @@ namespace EventsMS.Application.Queries.GetEventSections
             var eventEntity = await _repository.GetByIdAsync(request.EventId, cancellationToken);
 
             if (eventEntity == null) return new List<EventSectionDto>();
-
+            
             return eventEntity.Sections.Select(s => new EventSectionDto(
                 s.Id,
                 s.Name,
