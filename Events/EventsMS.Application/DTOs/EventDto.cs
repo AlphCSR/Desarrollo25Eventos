@@ -12,5 +12,6 @@ namespace EventsMS.Application.DTOs
         public string VenueName { get; set; }
         public string? ImageUrl { get; set; }
         public EventStatus Status { get; set; }
+        public string Category { get; set; }
     }
 }

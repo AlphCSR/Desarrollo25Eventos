@@ -10,6 +10,7 @@ namespace EventsMS.Application.DTOs
         string Description, 
         DateTime Date, 
         string VenueName, 
+        string Category,
         string ImageUrl,
         List<CreateSectionDto> Sections
     );
