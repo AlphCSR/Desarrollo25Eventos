@@ -1,0 +1,58 @@
+Summary
+  Generated on: 11/27/2025 - 9:00:52 AM
+  Coverage date: 11/25/2025 - 10:38:50 PM - 11/27/2025 - 9:00:51 AM
+  Parser: MultiReport (15x Cobertura)
+  Assemblies: 3
+  Classes: 32
+  Files: 33
+  Line coverage: 66%
+  Covered lines: 581
+  Uncovered lines: 298
+  Coverable lines: 879
+  Total lines: 1509
+  Branch coverage: 60.1% (77 of 128)
+  Covered branches: 77
+  Total branches: 128
+  Method coverage: 90% (135 of 150)
+  Full method coverage: 81.3% (122 of 150)
+  Covered methods: 135
+  Fully covered methods: 122
+  Total methods: 150
+
+UsersMS.Application                                                                        84.5%
+  UsersMS.Application.Behaviors.AuditBehavior<T1, T2>                                      69.5%
+  UsersMS.Application.Commands.CreateUser.CreateUserCommand                                 100%
+  UsersMS.Application.Commands.CreateUser.CreateUserCommandHandler                          100%
+  UsersMS.Application.Commands.DeleteUser.DeleteUserCommand                                 100%
+  UsersMS.Application.Commands.DeleteUser.DeleteUserCommandHandler                          100%
+  UsersMS.Application.Commands.UpdateUser.UpdateUserCommand                                 100%
+  UsersMS.Application.Commands.UpdateUser.UpdateUserCommandHandler                          100%
+  UsersMS.Application.Commands.UpdateUserPreferences.UpdateUserPreferencesCommandHandler    100%
+  UsersMS.Application.Commands.UpdateUserPreferencesCommand                                 100%
+  UsersMS.Application.DTOs.UpdateUserPreferencesDto                                         100%
+  UsersMS.Application.Queries.GetAllUsers.GetAllUsersQuery                                    0%
+  UsersMS.Application.Queries.GetAllUsers.GetAllUsersQueryHandler                             0%
+  UsersMS.Application.Queries.GetUserByEmail.GetUserByEmailQuery                              0%
+  UsersMS.Application.Queries.GetUserByEmail.GetUserByEmailQueryHandler                    64.2%
+  UsersMS.Application.Queries.GetUserById.GetUserByIdQuery                                    0%
+  UsersMS.Application.Queries.GetUserById.GetUserByIdQueryHandler                          64.2%
+
+UsersMS.Domain                                                                             97.1%
+  UsersMS.Domain.Common.BaseEntity                                                          100%
+  UsersMS.Domain.Entities.AuditLog                                                          100%
+  UsersMS.Domain.Entities.User                                                             98.4%
+  UsersMS.Domain.Entities.UserHistory                                                       100%
+  UsersMS.Domain.Exceptions.InvalidUserDataException                                        100%
+  UsersMS.Domain.Exceptions.KeycloakIntegrationException                                    100%
+  UsersMS.Domain.Exceptions.UserAlreadyExistsException                                      100%
+  UsersMS.Domain.Exceptions.UserNotFoundException                                           100%
+  UsersMS.Domain.ValueObjects.Email                                                          88%
+
+UsersMS.Infrastructure                                                                     47.3%
+  MongoAuditService                                                                        91.3%
+  UsersMS.Infrastructure.Migrations.InitialCreate                                             0%
+  UsersMS.Infrastructure.Migrations.UsersDbContextModelSnapshot                               0%
+  UsersMS.Infrastructure.Persistence.Configurations.UserConfiguration                        73%
+  UsersMS.Infrastructure.Persistence.UsersDbContext                                         100%
+  UsersMS.Infrastructure.Repositories.UserRepository                                        100%
+  UsersMS.Infrastructure.Services.KeycloakService                                          86.2%
