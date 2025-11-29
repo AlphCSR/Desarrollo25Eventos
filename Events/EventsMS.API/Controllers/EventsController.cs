@@ -5,6 +5,8 @@ using EventsMS.Application.DTOs;
 using EventsMS.Application.Queries.GetEvents;
 using EventsMS.Application.Queries.GetEventById;
 using EventsMS.Application.Queries.GetEventSections;
+using EventsMS.Application.Commands.UpdateEvent;
+using EventsMS.Application.Commands.DeleteEvent;
 
 namespace EventsMS.Controllers
 {
@@ -53,6 +55,47 @@ namespace EventsMS.Controllers
         {
             var sections = await _mediator.Send(new GetEventSectionsQuery(id));
             return Ok(sections);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id, [FromBody] UpdateEventDto dto)
+        {
+            try
+            {
+                var command = new UpdateEventCommand(id, dto.Title, dto.Description, dto.Date, dto.VenueName, dto.Category);
+                await _mediator.Send(command);
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(Guid id)
+        {
+            try
+            {
+                await _mediator.Send(new DeleteEventCommand(id));
+                return NoContent();
+            }
+            catch (KeyNotFoundException)
+            {
+                return NotFound();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
     }
 }
