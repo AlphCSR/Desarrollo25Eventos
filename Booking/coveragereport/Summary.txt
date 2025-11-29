@@ -1,0 +1,38 @@
+Summary
+  Generated on: 11/28/2025 - 11:17:59 PM
+  Coverage date: 11/28/2025 - 11:17:57 PM
+  Parser: Cobertura
+  Assemblies: 3
+  Classes: 12
+  Files: 12
+  Line coverage: 97.3%
+  Covered lines: 145
+  Uncovered lines: 4
+  Coverable lines: 149
+  Total lines: 341
+  Branch coverage: 100% (14 of 14)
+  Covered branches: 14
+  Total branches: 14
+  Method coverage: 96.9% (32 of 33)
+  Full method coverage: 96.9% (32 of 33)
+  Covered methods: 32
+  Fully covered methods: 32
+  Total methods: 33
+
+BookingMS.Application                                                              100%
+  BookingMS.Application.Commands.CreateBooking.CreateBookingCommand                100%
+  BookingMS.Application.Commands.CreateBooking.CreateBookingCommandHandler         100%
+  BookingMS.Application.Commands.PayBooking.PayBookingCommand                      100%
+  BookingMS.Application.Commands.PayBooking.PayBookingCommandHandler               100%
+  BookingMS.Application.Queries.GetActiveBooking.GetActiveBookingQuery             100%
+  BookingMS.Application.Queries.GetActiveBooking.GetActiveBookingQueryHandler      100%
+  BookingMS.Application.Queries.GetBookingsByUser.GetBookingsByUserQuery           100%
+  BookingMS.Application.Queries.GetBookingsByUser.GetBookingsByUserQueryHandler    100%
+
+BookingMS.Domain                                                                   100%
+  BookingMS.Domain.Entities.Booking                                                100%
+  BookingMS.Domain.Exceptions.BookingNotFoundException                             100%
+  BookingMS.Domain.Exceptions.InvalidBookingStateException                         100%
+
+BookingMS.Infrastructure                                                          86.2%
+  BookingMS.Infrastructure.Repositories.BookingRepository                         86.2%
