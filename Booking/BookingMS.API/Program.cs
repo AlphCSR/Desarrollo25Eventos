@@ -1,41 +1,97 @@
-var builder = WebApplication.CreateBuilder(args);
+using Microsoft.EntityFrameworkCore;
+using BookingMS.Infrastructure.Persistence.Configuration;
+using BookingMS.Infrastructure.Repositories;
+using BookingMS.Domain.Interfaces;
+using MassTransit;
+using BookingMS.Infrastructure.Services;
+using BookingMS.Shared.Events;
+using BookingMS.Infrastructure.Consumers;
+using BookingMS.Application.Commands.CreateBooking;
+using System.Diagnostics.CodeAnalysis;
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+namespace BookingMS.API
 {
-    app.MapOpenApi();
-}
+    [ExcludeFromCodeCoverage]
+    public class Program
+    {
+        public static void Main(string[] args)
+        {
+            var builder = WebApplication.CreateBuilder(args);
 
-app.UseHttpsRedirection();
+            // 1. DB Context
+            var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            var dataSourceBuilder = new Npgsql.NpgsqlDataSourceBuilder(connectionString);
+            dataSourceBuilder.EnableDynamicJson();
+            var dataSource = dataSourceBuilder.Build();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
+            builder.Services.AddDbContext<BookingDbContext>(options =>
+                options.UseNpgsql(dataSource));
 
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
+            // 2. Repositorios
+            builder.Services.AddScoped<IBookingRepository, BookingRepository>();
+            builder.Services.AddScoped<IEventPublisher, RabbitMqEventPublisher>();
 
-app.Run();
+            // 3. MediatR
+            builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CreateBookingCommand).Assembly));
 
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+            // 4. MassTransit
+            builder.Services.AddMassTransit(x =>
+            {
+                x.AddConsumer<PaymentCapturedConsumer>();
+                x.AddConsumer<PaymentFailedConsumer>();
+                x.AddConsumer<SeatUnlockedConsumer>();
+                
+                x.UsingRabbitMq((context, cfg) =>
+                {
+                    cfg.Host("localhost", "/", h => {
+                        h.Username("guest");
+                        h.Password("guest");
+                    });
+                    
+                    cfg.ReceiveEndpoint("booking-payment-captured", e =>
+                    {
+                        e.ConfigureConsumer<PaymentCapturedConsumer>(context);
+                    });
+                    
+                    cfg.ReceiveEndpoint("booking-payment-failed", e =>
+                    {
+                        e.ConfigureConsumer<PaymentFailedConsumer>(context);
+                    });
+
+                    cfg.ReceiveEndpoint("booking-seat-unlocked", e =>
+                    {
+                        e.ConfigureConsumer<SeatUnlockedConsumer>(context);
+                    });
+                });
+
+            });
+
+            builder.Services.AddControllers()
+                .AddJsonOptions(options =>
+                {
+                    options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+                });
+            builder.Services.AddEndpointsApiExplorer();
+            builder.Services.AddSwaggerGen();
+
+            var app = builder.Build();
+
+            // Migraciones automáticas
+            using (var scope = app.Services.CreateScope())
+            {
+                var db = scope.ServiceProvider.GetRequiredService<BookingDbContext>();
+                db.Database.Migrate();
+            }
+
+            if (app.Environment.IsDevelopment())
+            {
+                app.UseSwagger();
+                app.UseSwaggerUI();
+            }
+
+            app.UseAuthorization();
+            app.MapControllers();
+            app.Run();
+        }
+    }
 }
