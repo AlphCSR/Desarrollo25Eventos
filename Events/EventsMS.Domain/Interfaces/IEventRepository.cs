@@ -11,6 +11,7 @@ namespace EventsMS.Domain.Interfaces
         Task AddAsync(Event eventEntity, CancellationToken cancellationToken);
         Task<Event?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
         Task<IEnumerable<Event>> GetAllAsync(CancellationToken cancellationToken);
+        Task UpdateAsync(Event eventEntity, CancellationToken cancellationToken);
         Task SaveChangesAsync(CancellationToken cancellationToken);
     }
 }

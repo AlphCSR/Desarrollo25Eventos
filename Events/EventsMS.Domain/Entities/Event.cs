@@ -13,6 +13,7 @@ namespace EventsMS.Domain.Entities
         public DateTime Date { get; private set; }
         public string VenueName { get; private set; } // Nombre del lugar (Estadio, Teatro...)
         public string? ImageUrl { get; private set; } // URL del Blob Storage
+        public string Category { get; private set; }
         public EventStatus Status { get; private set; }
 
         // Relación con categorías/sectores de precios (ej: VIP, General)
@@ -21,17 +22,39 @@ namespace EventsMS.Domain.Entities
 
         protected Event() { }
 
-        public Event(string title, string description, DateTime date, string venueName)
+        public Event(string title, string description, DateTime date, string venueName, string category)
         {
             if(date < DateTime.UtcNow) throw new ArgumentException("La fecha del evento no puede ser en el pasado.");
             if(string.IsNullOrWhiteSpace(title)) throw new ArgumentException("El título es requerido.");
+            if(string.IsNullOrWhiteSpace(category)) throw new ArgumentException("La categoría es requerida.");
 
             Id = Guid.NewGuid();
             Title = title;
             Description = description;
             Date = date;
             VenueName = venueName;
+            Category = category;
             Status = EventStatus.Draft;
+        }
+
+        public void UpdateDetails(string title, string description, DateTime date, string venueName, string category)
+        {
+            if (Status == EventStatus.Cancelled) throw new InvalidOperationException("No se puede modificar un evento cancelado.");
+            if (date < DateTime.UtcNow) throw new ArgumentException("La fecha del evento no puede ser en el pasado.");
+            if (string.IsNullOrWhiteSpace(title)) throw new ArgumentException("El título es requerido.");
+            if (string.IsNullOrWhiteSpace(category)) throw new ArgumentException("La categoría es requerida.");
+
+            Title = title;
+            Description = description;
+            Date = date;
+            VenueName = venueName;
+            Category = category;
+        }
+
+        public void Cancel()
+        {
+            if (Status == EventStatus.Finished) throw new InvalidOperationException("No se puede cancelar un evento finalizado.");
+            Status = EventStatus.Cancelled;
         }
 
         public void SetImageUrl(string url) => ImageUrl = url;
