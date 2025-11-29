@@ -1,0 +1,6 @@
+@SeatingMS.API_HostAddress = http://localhost:5212
+
+GET {{SeatingMS.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
