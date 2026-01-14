@@ -1,6 +1,7 @@
 using MediatR;
 using EventsMS.Application.DTOs;
 using EventsMS.Domain.Interfaces;
+using EventsMS.Domain.Exceptions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -20,18 +21,22 @@ namespace EventsMS.Application.Queries.GetEventById
             var eventEntity = await _repository.GetByIdAsync(request.Id, cancellationToken);
 
             if (eventEntity == null) 
-                throw new Domain.Exceptions.EventNotFoundException(request.Id);
+                throw new EventNotFoundException(request.Id);
 
             return new EventDto
             {
                 Id = eventEntity.Id,
+                IdUser = eventEntity.IdUser,
                 Title = eventEntity.Title,
                 Description = eventEntity.Description,
                 Date = eventEntity.Date,
+                EndDate = eventEntity.EndDate,
                 VenueName = eventEntity.VenueName,
                 ImageUrl = eventEntity.ImageUrl,
                 Status = eventEntity.Status,
-                Category = eventEntity.Category
+                Type = eventEntity.Type,
+                StreamingUrl = null,
+                Categories = eventEntity.Categories
             };
         }
     }

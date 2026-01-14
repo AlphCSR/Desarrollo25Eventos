@@ -2,9 +2,10 @@ using MediatR;
 using EventsMS.Application.DTOs;
 using EventsMS.Domain.Interfaces;
 using EventsMS.Domain.Entities;
+using Event = EventsMS.Domain.Entities.Event;
+using EventsMS.Domain.Exceptions;
 using EventsMS.Shared.Events;
 using MassTransit;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -25,21 +26,24 @@ namespace EventsMS.Application.Commands.CreateEvent
         {
             
             if (string.IsNullOrWhiteSpace(request.EventData.Title))
-                throw new Domain.Exceptions.InvalidEventDataException("Event title cannot be empty.");
+                throw new InvalidEventDataException("El título del evento no puede estar vacío.");
 
             if (string.IsNullOrWhiteSpace(request.EventData.Description))
-                throw new Domain.Exceptions.InvalidEventDataException("Event description cannot be empty.");
+                throw new InvalidEventDataException("La descripción del evento no puede estar vacía.");
 
             if (request.EventData.Date <= DateTime.UtcNow)
-                throw new Domain.Exceptions.InvalidEventDataException("Event date must be in the future.");
+                throw new InvalidEventDataException("La fecha del evento debe ser en el futuro.");
 
-            // 1. Crear el Root
-            var newEvent = new Domain.Entities.Event(
+            var newEvent = new Event(
+                request.EventData.IdUser,
                 request.EventData.Title,
                 request.EventData.Description,
                 request.EventData.Date,
+                request.EventData.EndDate,
                 request.EventData.VenueName,
-                request.EventData.Category
+                request.EventData.Categories,
+                request.EventData.Type,
+                request.EventData.StreamingUrl
             );
 
             if(!string.IsNullOrEmpty(request.EventData.ImageUrl))
@@ -47,7 +51,6 @@ namespace EventsMS.Application.Commands.CreateEvent
                 newEvent.SetImageUrl(request.EventData.ImageUrl);
             }
 
-            // 2. Agregar secciones (El dominio se encarga de generar asientos si es numerado)
             if (request.EventData.Sections != null)
             {
                 foreach (var sec in request.EventData.Sections)
@@ -56,15 +59,17 @@ namespace EventsMS.Application.Commands.CreateEvent
                 }
             }
 
-            // 3. Persistir (Transaccional por defecto en EF Core)
             await _repository.AddAsync(newEvent, cancellationToken);
             await _repository.SaveChangesAsync(cancellationToken);
 
-            // 4. Publicar Evento
             var eventCreated = new EventCreatedEvent
             {
                 EventId = newEvent.Id,
+                IdUser = newEvent.IdUser,
                 Title = newEvent.Title,
+                Date = newEvent.Date,
+                EndDate = newEvent.EndDate,
+                Categories = newEvent.Categories,
                 Sections = newEvent.Sections.Select(s => new SectionDto(s.Id, s.Name, s.Price, s.Capacity, s.IsNumbered)).ToList()
             };
 
