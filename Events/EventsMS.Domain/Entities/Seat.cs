@@ -9,9 +9,9 @@ namespace EventsMS.Domain.Entities
         public Guid SectionId { get; private set; }
         public string Row { get; private set; }
         public int Number { get; private set; }
-        public string Code => $"{Row}-{Number}"; // Identificador visual
+        public string Code => $"{Row}-{Number}";
         public SeatStatus Status { get; private set; }
-        public Guid? UserId { get; private set; } // Usuario que lo tiene bloqueado/reservado
+        public Guid? UserId { get; private set; }
 
         protected Seat() { }
 
@@ -24,7 +24,7 @@ namespace EventsMS.Domain.Entities
             Status = SeatStatus.Available;
         }
 
-        // Métodos de dominio para cambiar estado (esenciales para la fase de Reservas)
+
         public void Lock(Guid userId)
         {
             if (Status != SeatStatus.Available) throw new InvalidOperationException("El asiento no está disponible.");
