@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\NotificationsMS.Application\NotificationsMS.Application.csproj" />
+    <ProjectReference Include="..\NotificationsMS.Domain\NotificationsMS.Domain.csproj" />
+    <ProjectReference Include="..\NotificationsMS.Shared\NotificationsMS.Shared.csproj" />
+    <ProjectReference Include="..\..\Booking\BookingMS.Shared\BookingMS.Shared.csproj" />
+    <ProjectReference Include="..\..\Events\EventsMS.Shared\EventsMS.Shared.csproj" />
+    <ProjectReference Include="..\..\Payments\PaymentsMS.Shared\PaymentsMS.Shared.csproj" />
+    <ProjectReference Include="..\..\Seating\SeatingMS.Shared\SeatingMS.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.7" />
+    <PackageReference Include="SendGrid" Version="9.29.3" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
