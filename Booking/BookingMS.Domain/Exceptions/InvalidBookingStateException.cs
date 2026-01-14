@@ -2,7 +2,7 @@ using System;
 
 namespace BookingMS.Domain.Exceptions
 {
-    public class InvalidBookingStateException : Exception
+    public class InvalidBookingStateException : DomainException
     {
         public InvalidBookingStateException(string message) : base(message)
         {
