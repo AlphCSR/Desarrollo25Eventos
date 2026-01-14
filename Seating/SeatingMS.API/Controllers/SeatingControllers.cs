@@ -5,6 +5,8 @@ using SeatingMS.Application.Queries.GetSeatsByEvent;
 using SeatingMS.Application.DTOs;
 using SeatingMS.Shared.Dtos;
 using SeatingMS.Application.Commands.UnlockSeat;
+using SeatingMS.Application.Queries.ValidateLock;
+using SeatingMS.Application.Queries.GetSeatById;
 
 using System.Diagnostics.CodeAnalysis;
 
@@ -52,10 +54,25 @@ namespace SeatingMS.API.Controllers
             }
         }
 
+        [HttpPost("validate-lock")]
+        public async Task<IActionResult> ValidateLock([FromBody] ValidateLockRequestDto request)
+        {
+            var isValid = await _mediator.Send(new ValidateLockQuery(request.SeatIds, request.UserId));
+            return Ok(isValid);
+        }
+
         [HttpGet("event/{eventId}")]
         public async Task<IActionResult> GetSeatsByEvent(Guid eventId)
         {
             var result = await _mediator.Send(new GetSeatsByEventQuery(eventId));
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetSeatById(Guid id)
+        {
+            var result = await _mediator.Send(new GetSeatByIdQuery(id));
+            if (result == null) return NotFound();
             return Ok(result);
         }
     }

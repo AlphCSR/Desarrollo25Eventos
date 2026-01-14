@@ -6,6 +6,14 @@ using SeatingMS.Domain.Interfaces;
 using MassTransit;
 using SeatingMS.Infrastructure.Consumers;
 
+using MongoDB.Driver;
+using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Bson;
+using MediatR;
+using SeatingMS.Application.Behaviors;
+using SeatingMS.Application.Interfaces;
+
 namespace SeatingMS.API
 {
     [ExcludeFromCodeCoverage]
@@ -13,22 +21,27 @@ namespace SeatingMS.API
     {
         public static void Main(string[] args)
         {
+            try
+            {
+                BsonSerializer.RegisterSerializer(new GuidSerializer(GuidRepresentation.Standard));
+            }
+            catch (BsonSerializationException) { }
+
             var builder = WebApplication.CreateBuilder(args);
 
-            // 1. DB Context
             builder.Services.AddDbContext<SeatingDbContext>(options =>
                 options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-            // 2. Repositorios
             builder.Services.AddScoped<IEventSeatRepository, EventSeatRepository>();
 
-            // 3. MediatR
             builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(SeatingMS.Application.Commands.LockSeat.LockSeatCommand).Assembly));
 
-            // 4. MassTransit (RabbitMQ)
             builder.Services.AddMassTransit(x =>
             {
                 x.AddConsumer<EventCreatedConsumer>();
+                x.AddConsumer<BookingConfirmedConsumer>();
+                x.AddConsumer<BookingCancelledConsumer>();
+                x.AddConsumer<EventStatusChangedConsumer>();
                 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -45,20 +58,24 @@ namespace SeatingMS.API
                         });
                     }
 
-                    cfg.ReceiveEndpoint("seating-event-created", e =>
-                    {
-                        e.ConfigureConsumer<EventCreatedConsumer>(context);
-                    });
+                    cfg.ConfigureEndpoints(context);
                 });
             });
+            
+            builder.Services.AddHostedService<SeatingMS.Infrastructure.BackgroundJobs.SeatLockExpirationWorker>();
 
             builder.Services.AddControllers();
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            
+            builder.Services.AddSingleton<IMongoClient>(sp => 
+                new MongoClient(builder.Configuration["MongoDb:ConnectionString"]));
+            builder.Services.AddScoped<IAuditService, MongoAuditService>();
+            builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(AuditBehavior<,>));
+            builder.Services.AddHttpContextAccessor();
 
             var app = builder.Build();
 
-            // Migraciones automáticas
             using (var scope = app.Services.CreateScope())
             {
                 var db = scope.ServiceProvider.GetRequiredService<SeatingDbContext>();
