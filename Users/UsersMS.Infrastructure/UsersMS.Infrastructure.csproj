@@ -4,6 +4,12 @@
     <ProjectReference Include="..\UsersMS.Application\UsersMS.Application.csproj" />
     <ProjectReference Include="..\UsersMS.Domain\UsersMS.Domain.csproj" />
     <ProjectReference Include="..\UsersMS.Shared\UsersMS.Shared.csproj" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="MongoDB.Driver" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0" />
   </ItemGroup>
 
   <PropertyGroup>

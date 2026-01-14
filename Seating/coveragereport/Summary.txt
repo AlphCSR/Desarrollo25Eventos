@@ -1,0 +1,36 @@
+Summary
+  Generated on: 11/28/2025 - 10:56:09 PM
+  Coverage date: 11/28/2025 - 10:56:07 PM
+  Parser: Cobertura
+  Assemblies: 3
+  Classes: 10
+  Files: 10
+  Line coverage: 99.1%
+  Covered lines: 119
+  Uncovered lines: 1
+  Coverable lines: 120
+  Total lines: 272
+  Branch coverage: 83.3% (10 of 12)
+  Covered branches: 10
+  Total branches: 12
+  Method coverage: 100% (32 of 32)
+  Full method coverage: 96.8% (31 of 32)
+  Covered methods: 32
+  Fully covered methods: 31
+  Total methods: 32
+
+SeatingMS.Application                                                          100%
+  SeatingMS.Application.Commands.LockSeat.LockSeatCommand                      100%
+  SeatingMS.Application.Commands.LockSeat.LockSeatCommandHandler               100%
+  SeatingMS.Application.Commands.UnlockSeat.UnlockSeatCommand                  100%
+  SeatingMS.Application.Commands.UnlockSeat.UnlockSeatCommandHandler           100%
+  SeatingMS.Application.Queries.GetSeatsByEvent.GetSeatsByEventQuery           100%
+  SeatingMS.Application.Queries.GetSeatsByEvent.GetSeatsByEventQueryHandler    100%
+
+SeatingMS.Domain                                                              97.6%
+  SeatingMS.Domain.Entities.EventSeat                                         97.2%
+  SeatingMS.Domain.Exceptions.SeatNotAvailableException                        100%
+  SeatingMS.Domain.Exceptions.SeatNotFoundException                            100%
+
+SeatingMS.Infrastructure                                                       100%
+  SeatingMS.Infrastructure.Repositories.EventSeatRepository                    100%
