@@ -1,6 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="MediatR" Version="14.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\BookingMS.Domain\BookingMS.Domain.csproj" />
     <ProjectReference Include="..\BookingMS.Shared\BookingMS.Shared.csproj" />
   </ItemGroup>
