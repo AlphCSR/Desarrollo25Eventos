@@ -11,6 +11,7 @@ namespace SeatingMS.Domain.Interfaces
         Task<EventSeat?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
         Task<IEnumerable<EventSeat>> GetByEventIdAsync(Guid eventId, CancellationToken cancellationToken);
         Task AddRangeAsync(IEnumerable<EventSeat> seats, CancellationToken cancellationToken);
+        Task<IEnumerable<EventSeat>> GetExpiredSeatsAsync(DateTime cutoff, CancellationToken cancellationToken);
         Task UpdateAsync(EventSeat seat, CancellationToken cancellationToken);
         Task SaveChangesAsync(CancellationToken cancellationToken);
     }
