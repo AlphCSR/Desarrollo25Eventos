@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using UsersMS.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using UsersMS.Infrastructure.Persistence;
 namespace UsersMS.Infrastructure.Migrations
 {
     [DbContext(typeof(UsersDbContext))]
-    partial class UsersDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251221163727_AddUserPersonalAttributes")]
+    partial class AddUserPersonalAttributes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,10 +55,6 @@ namespace UsersMS.Infrastructure.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("KeycloakId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Language")
                         .IsRequired()
                         .HasColumnType("text");
 
@@ -101,10 +100,6 @@ namespace UsersMS.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("Details")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("FriendlyMessage")
                         .IsRequired()
                         .HasColumnType("text");
 
