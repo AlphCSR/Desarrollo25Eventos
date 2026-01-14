@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using EventsMS.Domain.Entities;
+using EventsMS.Domain.ValueObjects;
 
 namespace EventsMS.Infrastructure.Persistence.Configuration
 {
@@ -19,11 +20,18 @@ namespace EventsMS.Infrastructure.Persistence.Configuration
             builder.Property(e => e.Description)
                 .HasMaxLength(1000);
 
-            // Configuración de la relación 1:N con EventSection
+            builder.OwnsOne(e => e.DateRange, dr =>
+            {
+                dr.Property(p => p.StartDate).HasColumnName("Date").IsRequired();
+                dr.Property(p => p.EndDate).HasColumnName("EndDate").IsRequired();
+            });
+
+            builder.PrimitiveCollection(e => e.Categories);
+
             builder.HasMany(e => e.Sections)
                 .WithOne()
                 .HasForeignKey(s => s.EventId)
-                .OnDelete(DeleteBehavior.Cascade); // Si borro evento, se borran secciones
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 
@@ -35,9 +43,10 @@ namespace EventsMS.Infrastructure.Persistence.Configuration
             builder.HasKey(s => s.Id);
 
             builder.Property(s => s.Name).IsRequired();
-            builder.Property(s => s.Price).HasPrecision(18, 2);
+            builder.Property(s => s.Price)
+                .HasConversion(v => v.Amount, v => Money.Create(v, "USD"))
+                .HasPrecision(18, 2);
 
-            // Configuración de la relación 1:N con Seat
             builder.HasMany(s => s.Seats)
                 .WithOne()
                 .HasForeignKey(st => st.SectionId)
@@ -52,7 +61,6 @@ namespace EventsMS.Infrastructure.Persistence.Configuration
             builder.ToTable("Seats");
             builder.HasKey(s => s.Id);
             
-            // Índice para búsquedas rápidas por estado o código
             builder.HasIndex(s => s.Status);
         }
     }

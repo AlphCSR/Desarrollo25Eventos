@@ -13,13 +13,18 @@ namespace EventsMS.Infrastructure.Persistence
         {
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+            base.OnConfiguring(optionsBuilder);
+        }
+
         public DbSet<Event> Events { get; set; }
         public DbSet<EventSection> EventSections { get; set; }
         public DbSet<Seat> Seats { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            // Aplicar las configuraciones definidas arriba
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(EventsDbContext).Assembly);
         }
     }

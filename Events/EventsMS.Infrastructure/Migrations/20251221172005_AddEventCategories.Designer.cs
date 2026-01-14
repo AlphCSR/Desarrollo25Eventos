@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using EventsMS.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -12,9 +13,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace EventsMS.Infrastructure.Migrations
 {
     [DbContext(typeof(EventsDbContext))]
-    partial class EventsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20251221172005_AddEventCategories")]
+    partial class AddEventCategories
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -41,9 +44,6 @@ namespace EventsMS.Infrastructure.Migrations
                         .HasMaxLength(1000)
                         .HasColumnType("character varying(1000)");
 
-                    b.Property<DateTime>("EndDate")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<Guid>("IdUser")
                         .HasColumnType("uuid");
 
@@ -53,16 +53,10 @@ namespace EventsMS.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .HasColumnType("integer");
 
-                    b.Property<string>("StreamingUrl")
-                        .HasColumnType("text");
-
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
                         .HasColumnType("character varying(200)");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
 
                     b.Property<string>("VenueName")
                         .IsRequired()
