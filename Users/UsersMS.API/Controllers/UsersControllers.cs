@@ -1,5 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
 using UsersMS.Application.Commands.CreateUser;
 using UsersMS.Application.Commands.DeleteUser;
 using UsersMS.Application.Commands.UpdateUser;
@@ -8,14 +10,12 @@ using UsersMS.Application.Queries.GetAllUsers;
 using UsersMS.Application.Queries.GetUserById;
 using UsersMS.Application.Queries.GetUserByEmail;
 using UsersMS.Domain.Exceptions;
-using UsersMS.Application.Commands;
 using UsersMS.Application.Queries.GetUserHistory;
+using UsersMS.Shared.Enums;
 
 namespace UsersMS.API.Controllers
 {
-    /// <summary>
-    /// Controlador para la gestión de usuarios.
-    /// </summary>
+
     [ApiController]
     [Route("api/[controller]")]
     public class UsersController : ControllerBase
@@ -27,13 +27,6 @@ namespace UsersMS.API.Controllers
             _mediator = mediator;
         }
 
-        /// <summary>
-        /// Crea un nuevo usuario.
-        /// </summary>
-        /// <param name="dto">Datos del usuario a crear.</param>
-        /// <returns>El ID del usuario creado.</returns>
-        /// <response code="201">Usuario creado exitosamente.</response>
-        /// <response code="400">Si los datos son inválidos o el usuario ya existe.</response>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -59,13 +52,6 @@ namespace UsersMS.API.Controllers
             }
         }
 
-        /// <summary>
-        /// Obtiene un usuario por su ID.
-        /// </summary>
-        /// <param name="id">ID del usuario.</param>
-        /// <returns>Datos del usuario.</returns>
-        /// <response code="200">Usuario encontrado.</response>
-        /// <response code="404">Usuario no encontrado.</response>
         [HttpGet("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -76,13 +62,6 @@ namespace UsersMS.API.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Obtiene un usuario por su email.
-        /// </summary>
-        /// <param name="email">Email del usuario.</param>
-        /// <returns>Datos del usuario.</returns>
-        /// <response code="200">Usuario encontrado.</response>
-        /// <response code="404">Usuario no encontrado.</response>
         [HttpGet("email/{email}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -99,11 +78,6 @@ namespace UsersMS.API.Controllers
             }
         }
 
-        /// <summary>
-        /// Obtiene todos los usuarios.
-        /// </summary>
-        /// <returns>Lista de usuarios.</returns>
-        /// <response code="200">Lista de usuarios obtenida exitosamente.</response>
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()
@@ -112,15 +86,6 @@ namespace UsersMS.API.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Actualiza un usuario existente.
-        /// </summary>
-        /// <param name="id">ID del usuario a actualizar.</param>
-        /// <param name="dto">Nuevos datos del usuario.</param>
-        /// <returns>No Content si la actualización fue exitosa.</returns>
-        /// <response code="204">Usuario actualizado exitosamente.</response>
-        /// <response code="400">Si los datos son inválidos.</response>
-        /// <response code="404">Usuario no encontrado.</response>
         [HttpPut("id/{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -144,13 +109,6 @@ namespace UsersMS.API.Controllers
             }
         }
 
-        /// <summary>
-        /// Elimina (desactiva) un usuario.
-        /// </summary>
-        /// <param name="id">ID del usuario a eliminar.</param>
-        /// <returns>No Content si la eliminación fue exitosa.</returns>
-        /// <response code="204">Usuario eliminado exitosamente.</response>
-        /// <response code="404">Usuario no encontrado.</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -168,42 +126,6 @@ namespace UsersMS.API.Controllers
             }
         }
 
-        /// <summary>
-        /// Actualiza las preferencias de un usuario.
-        /// </summary>
-        /// <param name="id">ID del usuario.</param>
-        /// <param name="dto">Nuevas preferencias.</param>
-        /// <returns>No Content si la actualización fue exitosa.</returns>
-        /// <response code="204">Preferencias actualizadas exitosamente.</response>
-        /// <response code="400">Si los datos son inválidos.</response>
-        /// <response code="404">Usuario no encontrado.</response>
-        [HttpPut("{id}/preferences")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> UpdatePreferences(Guid id, [FromBody] UpdateUserPreferencesDto dto)
-        {
-            try
-            {
-                var command = new UpdateUserPreferencesCommand(id, dto);
-                await _mediator.Send(command);
-                return NoContent();
-            }
-            catch (UserNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (InvalidUserDataException ex)
-            {
-                return BadRequest(ex.Message);
-            }
-        }
-
-        /// <summary>
-        /// Obtiene el historial de un usuario.
-        /// </summary>
-        /// <param name="id">ID del usuario.</param>
-        /// <returns>Historial del usuario.</returns>
         [HttpGet("{id}/history")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -211,6 +133,44 @@ namespace UsersMS.API.Controllers
         {
              var result = await _mediator.Send(new GetUserHistoryQuery(id));
              return Ok(result);
+        }
+ 
+        [HttpGet("me")]
+        [Authorize]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetMe()
+        {
+            var subClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (string.IsNullOrEmpty(subClaim))
+            {
+                return Unauthorized("Token inválido: falta 'sub' claim.");
+            }
+
+            var emailClaim = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+            if (string.IsNullOrEmpty(emailClaim)) return Unauthorized("Token inválido: falta 'email' claim.");
+
+            try
+            {
+                var user = await _mediator.Send(new GetUserByEmailQuery(emailClaim));
+                return Ok(user);
+            }
+            catch (UserNotFoundException)
+            {
+                var nameClaim = User.Claims.FirstOrDefault(c => c.Type == "name")?.Value ?? 
+                                User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value ?? "Unknown";
+                
+                var role = UserRole.User;
+                if (User.IsInRole("admin")) role = UserRole.Admin;
+                else if (User.IsInRole("organizer")) role = UserRole.Organizer;
+
+                var dto = new CreateUserDto(nameClaim, emailClaim, "jit-password-ignored", role, subClaim);
+                
+                var command = new CreateUserCommand(dto);
+                var userId = await _mediator.Send(command);
+                
+                var newUser = await _mediator.Send(new GetUserByIdQuery(userId));
+                return Ok(newUser);
+            }
         }
     }
 }
