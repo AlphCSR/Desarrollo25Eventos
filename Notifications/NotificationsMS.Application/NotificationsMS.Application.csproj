@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\NotificationsMS.Domain\NotificationsMS.Domain.csproj" />
+    <ProjectReference Include="..\NotificationsMS.Shared\NotificationsMS.Shared.csproj" />
+    <ProjectReference Include="..\..\Booking\BookingMS.Shared\BookingMS.Shared.csproj" />
+    <ProjectReference Include="..\..\Payments\PaymentsMS.Shared\PaymentsMS.Shared.csproj" />
+    <ProjectReference Include="..\..\Services\ServicesMS.Shared\ServicesMS.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="14.0.0" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
