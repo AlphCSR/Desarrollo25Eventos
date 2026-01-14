@@ -17,7 +17,7 @@ namespace SeatingMS.Infrastructure.Persistence.Configuration
             builder.Property(x => x.Row).IsRequired().HasMaxLength(10);
             builder.Property(x => x.Status).IsRequired();
             
-            builder.HasIndex(x => new { x.EventId, x.SectionId });
+            builder.HasIndex(x => new { x.EventId, x.SectionId, x.Row, x.Number }).IsUnique();
             
             builder.Property(x => x.Status).IsConcurrencyToken();
         }

@@ -37,6 +37,13 @@ namespace SeatingMS.Infrastructure.Repositories
             await _context.EventSeats.AddRangeAsync(seats, cancellationToken);
         }
 
+        public async Task<IEnumerable<EventSeat>> GetExpiredSeatsAsync(DateTime cutoff, CancellationToken cancellationToken)
+        {
+            return await _context.EventSeats
+                .Where(x => x.Status == SeatingMS.Shared.Enum.SeatStatus.Locked && x.LockExpirationTime < cutoff)
+                .ToListAsync(cancellationToken);
+        }
+
         public Task UpdateAsync(EventSeat seat, CancellationToken cancellationToken)
         {
             _context.EventSeats.Update(seat);
@@ -45,7 +52,14 @@ namespace SeatingMS.Infrastructure.Repositories
 
         public async Task SaveChangesAsync(CancellationToken cancellationToken)
         {
-            await _context.SaveChangesAsync(cancellationToken);
+            try
+            {
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+            catch (DbUpdateConcurrencyException ex)
+            {
+                throw new SeatingMS.Domain.Exceptions.SeatNotAvailableException("El asiento ha sido modificado por otro proceso. Intenta nuevamente.");
+            }
         }
     }
 }

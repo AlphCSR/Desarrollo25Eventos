@@ -4,11 +4,14 @@
     <ProjectReference Include="..\SeatingMS.Application\SeatingMS.Application.csproj" />
     <ProjectReference Include="..\SeatingMS.Domain\SeatingMS.Domain.csproj" />
     <ProjectReference Include="..\SeatingMS.Shared\SeatingMS.Shared.csproj" />
+    <ProjectReference Include="..\..\Booking\BookingMS.Shared\BookingMS.Shared.csproj" />
+    <ProjectReference Include="..\..\Events\EventsMS.Shared\EventsMS.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="MassTransit" Version="8.5.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="MongoDB.Driver" Version="3.5.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0" />
   </ItemGroup>
 
