@@ -7,91 +7,73 @@ using UsersMS.Domain.Exceptions;
 
 namespace UsersMS.Domain.Entities
 {
-    /// <summary>
-    /// Representa un usuario en el sistema.
-    /// </summary>
     public class User : BaseEntity
     {
-        public string FullName { get; private set; }
-        public string Email { get; private set; }
+        public PersonName FullName { get; private set; }
+        public Email Email { get; private set; }
         public string KeycloakId { get; private set; }
         public UserRole Role { get; private set; }
         public UserState State { get; private set; }
         public List<string> Preferences { get; private set; } = new();
+
+        public PhoneNumber? PhoneNumber { get; private set; }
+        public string? DocumentId { get; private set; }
+        public DateTime? DateOfBirth { get; private set; }
+        public string? Address { get; private set; }
+        public string? ProfilePictureUrl { get; private set; }
+        public string Language { get; private set; } = "es";
+
         private readonly List<UserHistory> _history = new();
         
-        /// <summary>
-        /// Historial de cambios del usuario.
-        /// </summary>
         public IReadOnlyCollection<UserHistory> History => _history.AsReadOnly();
 
-        protected User() { }
+        protected User() 
+        { 
+            FullName = null!;
+            Email = null!;
+            KeycloakId = null!;
+            Language = "es";
+        }
 
-        /// <summary>
-        /// Constructor para crear un nuevo usuario.
-        /// </summary>
-        /// <param name="fullName">Nombre completo del usuario.</param>
-        /// <param name="email">Correo electrónico del usuario.</param>
-        /// <param name="keycloakId">ID del usuario en Keycloak.</param>
-        /// <param name="role">Rol del usuario.</param>
-        /// <exception cref="InvalidUserDataException">Lanzada si los datos son inválidos.</exception>
         public User(string fullName, string email, string keycloakId, UserRole role)
         {
-            if (string.IsNullOrWhiteSpace(fullName)) throw new InvalidUserDataException("El nombre es requerido.");
             if (string.IsNullOrWhiteSpace(keycloakId)) throw new InvalidUserDataException("El ID de Keycloak es requerido.");
 
-            FullName = fullName;
-            Email = ValueObjects.Email.Create(email).Value;
+            FullName = PersonName.Create(fullName);
+            Email = ValueObjects.Email.Create(email);
             KeycloakId = keycloakId;
             Role = role;
             State = UserState.Active;
-
-            AddHistory("UserCreated", $"Usuario creado con rol {role}");
         }
 
-        /// <summary>
-        /// Actualiza las preferencias del usuario.
-        /// </summary>
-        /// <param name="newPreferences">Nueva lista de preferencias.</param>
-        /// <exception cref="InvalidUserDataException">Lanzada si la lista de preferencias es nula.</exception>
         public void UpdatePreferences(List<string> newPreferences)
         {
             if (newPreferences == null) 
                 throw new InvalidUserDataException("La lista de preferencias no puede ser nula.");
 
-            // Detectar cambios para el historial
             var oldPrefs = string.Join(", ", Preferences ?? new List<string>());
             var newPrefs = string.Join(", ", newPreferences);
 
             if (oldPrefs != newPrefs)
             {
-                Preferences = newPreferences; // Reemplazamos la lista
+                Preferences = newPreferences; 
                 UpdatedAt = DateTime.UtcNow;
             }
         }
     
-        /// <summary>
-        /// Actualiza el perfil del usuario.
-        /// </summary>
-        /// <param name="newName">Nuevo nombre completo.</param>
-        /// <exception cref="InvalidUserDataException">Lanzada si el nombre está vacío.</exception>
-        public void UpdateProfile(string newName)
+        public void UpdateProfile(string newName, string? phoneNumber, string? documentId, DateTime? dateOfBirth, string? address, string? profilePictureUrl, string? language = "es")
         {
-            if (string.IsNullOrWhiteSpace(newName)) throw new InvalidUserDataException("El nombre no puede estar vacío.");
+            FullName = PersonName.Create(newName);
+            PhoneNumber = !string.IsNullOrWhiteSpace(phoneNumber) ? ValueObjects.PhoneNumber.Create(phoneNumber) : null;
+            DocumentId = documentId;
+            DateOfBirth = dateOfBirth;
+            Address = address;
+            ProfilePictureUrl = profilePictureUrl;
+            Language = language ?? "es";
 
-            var oldName = FullName ?? "";
-            FullName = newName ?? "";
-            UpdatedAt = DateTime.UtcNow ;
+            UpdatedAt = DateTime.UtcNow;
         }
 
-        private void AddHistory(string action, string details)
-        {
-            _history.Add(new UserHistory(this.Id, action, details));
-        }
-
-        /// <summary>
-        /// Desactiva al usuario.
-        /// </summary>
         public void Deactivate()
         {
             if (State == UserState.Inactive) return;
@@ -99,5 +81,6 @@ namespace UsersMS.Domain.Entities
             State = UserState.Inactive;
             UpdatedAt = DateTime.UtcNow;
         }
+
     }
 }
