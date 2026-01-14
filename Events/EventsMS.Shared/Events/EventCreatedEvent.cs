@@ -8,7 +8,11 @@ namespace EventsMS.Shared.Events
     public class EventCreatedEvent
     {
         public Guid EventId { get; set; }
+        public Guid IdUser { get; set; }
         public string Title { get; set; }
+        public DateTime Date { get; set; }
+        public DateTime EndDate { get; set; }
+        public List<string> Categories { get; set; } = new();
         public List<SectionDto> Sections { get; set; } = new();
     }
 }
