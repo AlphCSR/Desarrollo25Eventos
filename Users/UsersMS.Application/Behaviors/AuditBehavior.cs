@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Threading;
 using System.Threading.Tasks;
 using UsersMS.Application.Interfaces;
@@ -10,10 +11,6 @@ using UsersMS.Domain.Entities;
 
 namespace UsersMS.Application.Behaviors;
 
-/// <summary>
-/// Comportamiento de auditoría para mediatr.
-/// </summary>
-// [ExcludeFromCodeCoverage]
 public class AuditBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     where TRequest : IRequest<TResponse>
 {
@@ -26,13 +23,6 @@ public class AuditBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TR
         _httpContextAccessor = httpContextAccessor;
     }
 
-    /// <summary>
-    /// Maneja la auditoría de los comandos.
-    /// </summary>
-    /// <param name="request">El comando a ejecutar.</param>
-    /// <param name="next">El delegado del siguiente handler.</param>
-    /// <param name="cancellationToken">El token de cancelación.</param>
-    /// <returns>El resultado del comando.</returns>
     public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
     {
         var stopwatch = Stopwatch.StartNew();
@@ -48,7 +38,7 @@ public class AuditBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TR
         {
             UserId = userId,
             Action = requestName,
-            Payload = JsonSerializer.Serialize(request)
+            Payload = SanitizePayload(request)
         };
 
         try
@@ -67,6 +57,51 @@ public class AuditBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TR
         {
             stopwatch.Stop();
             await _auditService.LogAsync(log);
+        }
+    }
+
+    private string SanitizePayload(object request)
+    {
+        try
+        {
+            var jsonString = JsonSerializer.Serialize(request);
+            var jsonNode = JsonNode.Parse(jsonString);
+
+            if (jsonNode is JsonObject jsonObj)
+            {
+                SanitizeNode(jsonObj);
+            }
+
+            return jsonNode?.ToJsonString() ?? "{}";
+        }
+        catch
+        {
+            return "Error serializing payload";
+        }
+    }
+
+    private void SanitizeNode(JsonObject node)
+    {
+        foreach (var property in node.ToList()) 
+        {
+            if (property.Key.Contains("Password", StringComparison.OrdinalIgnoreCase))
+            {
+                node[property.Key] = "******";
+            }
+            else if (property.Value is JsonObject childObject)
+            {
+                SanitizeNode(childObject);
+            }
+            else if (property.Value is JsonArray childArray)
+            {
+                foreach (var item in childArray)
+                {
+                    if (item is JsonObject arrayObject)
+                    {
+                        SanitizeNode(arrayObject);
+                    }
+                }
+            }
         }
     }
 }
