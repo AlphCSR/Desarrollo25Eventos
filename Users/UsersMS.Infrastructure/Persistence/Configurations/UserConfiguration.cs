@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using UsersMS.Domain.Entities;
+using UsersMS.Domain.ValueObjects;
 
 namespace UsersMS.Infrastructure.Persistence.Configurations
 {
@@ -11,13 +12,20 @@ namespace UsersMS.Infrastructure.Persistence.Configurations
             builder.HasKey(u => u.Id);
 
             builder.Property(u => u.Email)
+                .HasConversion(v => v.Value, v => Email.Create(v))
                 .IsRequired()
                 .HasMaxLength(150);
             
             builder.HasIndex(u => u.Email).IsUnique();
 
+            builder.Property(u => u.FullName)
+                .HasConversion(v => v.Value, v => PersonName.Create(v))
+                .IsRequired()
+                .HasMaxLength(200);
+
             builder.Property(u => u.KeycloakId)
                 .IsRequired();
+
 
             builder.Property(u => u.Preferences)
                 .HasConversion(
@@ -25,6 +33,16 @@ namespace UsersMS.Infrastructure.Persistence.Configurations
                     v => System.Text.Json.JsonSerializer.Deserialize<System.Collections.Generic.List<string>>(v, (System.Text.Json.JsonSerializerOptions)null) ?? new System.Collections.Generic.List<string>()
                 )
                 .IsRequired(false);
+
+            builder.Property(u => u.PhoneNumber)
+                .HasConversion(v => v != null ? v.Value : null, v => v != null ? PhoneNumber.Create(v) : null)
+                .HasMaxLength(20)
+                .IsRequired(false);
+            
+            builder.Property(u => u.DocumentId).HasMaxLength(50).IsRequired(false);
+            builder.Property(u => u.Address).HasMaxLength(250).IsRequired(false);
+            builder.Property(u => u.ProfilePictureUrl).HasMaxLength(500).IsRequired(false);
+            builder.Property(u => u.DateOfBirth).IsRequired(false);
             
             builder.HasMany(u => u.History)
                 .WithOne()
