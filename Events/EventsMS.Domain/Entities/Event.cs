@@ -2,53 +2,68 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using EventsMS.Shared.Enums;
+using EventsMS.Domain.Exceptions;
+using EventsMS.Domain.ValueObjects;
 
 namespace EventsMS.Domain.Entities
 {
     public class Event 
     {
         public Guid Id { get; private set; }
+        public Guid IdUser { get; private set; }
         public string Title { get; private set; }
         public string Description { get; private set; }
-        public DateTime Date { get; private set; }
-        public string VenueName { get; private set; } // Nombre del lugar (Estadio, Teatro...)
-        public string? ImageUrl { get; private set; } // URL del Blob Storage
-        public string Category { get; private set; }
+        public DateRange DateRange { get; private set; }
+        public DateTime Date => DateRange.StartDate;
+        public DateTime EndDate => DateRange.EndDate;
+        public string VenueName { get; private set; }
+        public string? ImageUrl { get; private set; }
+        public List<string> Categories { get; private set; } = new();
         public EventStatus Status { get; private set; }
+        public EventType Type { get; private set; } 
+        public string? StreamingUrl { get; private set; } 
 
-        // Relación con categorías/sectores de precios (ej: VIP, General)
         private readonly List<EventSection> _sections = new();
         public IReadOnlyCollection<EventSection> Sections => _sections.AsReadOnly();
 
-        protected Event() { }
-
-        public Event(string title, string description, DateTime date, string venueName, string category)
-        {
-            if(date < DateTime.UtcNow) throw new ArgumentException("La fecha del evento no puede ser en el pasado.");
-            if(string.IsNullOrWhiteSpace(title)) throw new ArgumentException("El título es requerido.");
-            if(string.IsNullOrWhiteSpace(category)) throw new ArgumentException("La categoría es requerida.");
-
-            Id = Guid.NewGuid();
-            Title = title;
-            Description = description;
-            Date = date;
-            VenueName = venueName;
-            Category = category;
-            Status = EventStatus.Draft;
+        protected Event() 
+        { 
+            Title = null!;
+            Description = null!;
+            DateRange = null!;
+            VenueName = null!;
         }
 
-        public void UpdateDetails(string title, string description, DateTime date, string venueName, string category)
+        public Event(Guid idUser, string title, string description, DateTime date, DateTime endDate, string venueName, List<string> categories, EventType type = EventType.Physical, string? streamingUrl = null)
         {
-            if (Status == EventStatus.Cancelled) throw new InvalidOperationException("No se puede modificar un evento cancelado.");
-            if (date < DateTime.UtcNow) throw new ArgumentException("La fecha del evento no puede ser en el pasado.");
-            if (string.IsNullOrWhiteSpace(title)) throw new ArgumentException("El título es requerido.");
-            if (string.IsNullOrWhiteSpace(category)) throw new ArgumentException("La categoría es requerida.");
+            if(string.IsNullOrWhiteSpace(title)) throw new InvalidEventDataException("El título es requerido.");
+            if(categories == null || !categories.Any()) throw new InvalidEventDataException("Al menos una categoría es requerida.");
+
+            Id = Guid.NewGuid();
+            IdUser = idUser;
+            Title = title;
+            Description = description;
+            DateRange = DateRange.Create(date, endDate);
+            VenueName = venueName;
+            Categories = categories;
+            Status = EventStatus.Draft;
+            Type = type;
+            StreamingUrl = streamingUrl;
+        }
+
+        public void UpdateDetails(string title, string description, DateTime date, DateTime endDate, string venueName, List<string> categories, EventType type, string? streamingUrl)
+        {
+            if (Status == EventStatus.Cancelled) throw new InvalidEventDataException("No se puede modificar un evento cancelado.");
+            if (string.IsNullOrWhiteSpace(title)) throw new InvalidEventDataException("El título es requerido.");
+            if (categories == null || !categories.Any()) throw new InvalidEventDataException("Al menos una categoría es requerida.");
 
             Title = title;
             Description = description;
-            Date = date;
+            DateRange = DateRange.Create(date, endDate);
             VenueName = venueName;
-            Category = category;
+            Categories = categories;
+            Type = type;
+            StreamingUrl = streamingUrl;
         }
 
         public void Cancel()
@@ -57,12 +72,37 @@ namespace EventsMS.Domain.Entities
             Status = EventStatus.Cancelled;
         }
 
+        public void Start()
+        {
+            if (Status != EventStatus.Published) return;
+            Status = EventStatus.Live;
+        }
+
+        public void Finish()
+        {
+            if (Status != EventStatus.Published && Status != EventStatus.Live) return; 
+            Status = EventStatus.Finished;
+        }
+
+        public void ResetToPublished()
+        {
+            if (Status == EventStatus.Live)
+            {
+                Status = EventStatus.Published;
+            }
+        }
+
         public void SetImageUrl(string url) => ImageUrl = url;
 
         public void Publish()
         {
             if (!_sections.Any()) throw new InvalidOperationException("No se puede publicar un evento sin localidades.");
             Status = EventStatus.Published;
+        }
+
+        public void UpdateStatus(EventStatus newStatus)
+        {
+            Status = newStatus;
         }
 
         public void AddSection(string name, decimal price, int capacity, bool isNumbered)

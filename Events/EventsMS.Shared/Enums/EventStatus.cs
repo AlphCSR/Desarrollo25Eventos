@@ -2,9 +2,10 @@ namespace EventsMS.Shared.Enums
 {
     public enum EventStatus
     {
-        Draft,      // Borrador
-        Published,  // A la venta
-        Cancelled,  // Cancelado
-        Finished    // Finalizado
+        Draft = 0,
+        Published = 1,
+        Cancelled = 2,
+        Finished = 3,
+        Live = 4
     }
 }

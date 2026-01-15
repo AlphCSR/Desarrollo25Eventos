@@ -1,0 +1,61 @@
+Summary
+  Generated on: 11/28/2025 - 9:36:46 PM
+  Coverage date: 11/27/2025 - 6:06:08 PM - 11/28/2025 - 9:36:44 PM
+  Parser: MultiReport (15x Cobertura)
+  Assemblies: 5
+  Classes: 31
+  Files: 27
+  Line coverage: 84.5%
+  Covered lines: 373
+  Uncovered lines: 68
+  Coverable lines: 441
+  Total lines: 875
+  Branch coverage: 55.8% (38 of 68)
+  Covered branches: 38
+  Total branches: 68
+  Method coverage: 95.1% (99 of 104)
+  Full method coverage: 92.3% (96 of 104)
+  Covered methods: 99
+  Fully covered methods: 96
+  Total methods: 104
+
+EventsMS.API                                                                    49.5%
+  EventsMS.Controllers.EventsController                                          100%
+  Program                                                                          0%
+
+EventsMS.Application                                                            93.7%
+  EventsMS.Application.Commands.CreateEvent.CreateEventCommand                   100%
+  EventsMS.Application.Commands.CreateEvent.CreateEventCommandHandler             92%
+  EventsMS.Application.Commands.DeleteEvent.DeleteEventCommand                   100%
+  EventsMS.Application.Commands.DeleteEvent.DeleteEventCommandHandler           84.6%
+  EventsMS.Application.Commands.UpdateEvent.UpdateEventCommand                   100%
+  EventsMS.Application.Commands.UpdateEvent.UpdateEventCommandHandler            100%
+  EventsMS.Application.DependencyInjection                                         0%
+  EventsMS.Application.DTOs.CreateEventDto                                       100%
+  EventsMS.Application.DTOs.CreateSectionDto                                     100%
+  EventsMS.Application.DTOs.EventDto                                             100%
+  EventsMS.Application.DTOs.EventSectionDto                                      100%
+  EventsMS.Application.DTOs.UpdateEventDto                                       100%
+  EventsMS.Application.Queries.GetEventById.GetEventByIdQuery                    100%
+  EventsMS.Application.Queries.GetEventById.GetEventByIdQueryHandler             100%
+  EventsMS.Application.Queries.GetEvents.GetEventsQueryHandler                   100%
+  EventsMS.Application.Queries.GetEventSections.GetEventSectionsQuery            100%
+  EventsMS.Application.Queries.GetEventSections.GetEventSectionsQueryHandler     100%
+
+EventsMS.Domain                                                                 94.6%
+  EventsMS.Domain.Entities.Event                                                91.8%
+  EventsMS.Domain.Entities.EventSection                                         96.4%
+  EventsMS.Domain.Entities.Seat                                                 96.5%
+  EventsMS.Domain.Exceptions.EventNotFoundException                              100%
+  EventsMS.Domain.Exceptions.InvalidEventDataException                           100%
+
+EventsMS.Infrastructure                                                          100%
+  EventsMS.Infrastructure.Persistence.Configuration.EventConfiguration           100%
+  EventsMS.Infrastructure.Persistence.Configuration.EventSectionConfiguration    100%
+  EventsMS.Infrastructure.Persistence.Configuration.SeatConfiguration            100%
+  EventsMS.Infrastructure.Persistence.EventsDbContext                            100%
+  EventsMS.Infrastructure.Repository.EventRepository                             100%
+
+EventsMS.Shared                                                                  100%
+  EventsMS.Shared.Events.EventCreatedEvent                                       100%
+  EventsMS.Shared.Events.SectionDto                                              100%
