@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\ReportsMS.Domain\ReportsMS.Domain.csproj" />
+    <ProjectReference Include="..\ReportsMS.Shared\ReportsMS.Shared.csproj" />
+    <ProjectReference Include="..\..\Booking\BookingMS.Shared\BookingMS.Shared.csproj" />
+    <ProjectReference Include="..\..\Payments\PaymentsMS.Shared\PaymentsMS.Shared.csproj" />
+    <ProjectReference Include="..\..\Events\EventsMS.Shared\EventsMS.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" Version="14.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.3.0" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>
