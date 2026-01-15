@@ -32,8 +32,27 @@ namespace BookingMS.Infrastructure.Repositories
             return await _context.Bookings
                 .Where(x => x.UserId == userId)
                 .OrderByDescending(x => x.CreatedAt)
-                .Where(x => x.UserId == userId)
+                .ToListAsync();
+        }
+
+        public async Task<(IEnumerable<Booking> Items, int TotalCount)> GetPagedByUserIdAsync(Guid userId, int page, int pageSize)
+        {
+            var query = _context.Bookings.Where(x => x.UserId == userId);
+            
+            var totalCount = await query.CountAsync();
+            var items = await query
                 .OrderByDescending(x => x.CreatedAt)
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (items, totalCount);
+        }
+
+        public async Task<IEnumerable<Booking>> GetByEventIdAsync(Guid eventId)
+        {
+            return await _context.Bookings
+                .Where(x => x.EventId == eventId)
                 .ToListAsync();
         }
 
@@ -41,6 +60,31 @@ namespace BookingMS.Infrastructure.Repositories
         {
             return await _context.Bookings
                 .FirstOrDefaultAsync(x => x.UserId == userId && x.EventId == eventId && x.Status == Shared.Enums.BookingStatus.PendingPayment, cancellationToken);
+        }
+
+        public async Task<IEnumerable<Booking>> GetExpiredBookingsAsync(DateTime expirationTime, CancellationToken cancellationToken)
+        {
+            return await _context.Bookings
+                .Where(x => x.Status == Shared.Enums.BookingStatus.PendingPayment && x.CreatedAt < expirationTime)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<Booking>> GetBookingsNeedingReminderAsync(DateTime reminderThreshold, CancellationToken cancellationToken)
+        {
+            return await _context.Bookings
+                .Where(x => x.Status == Shared.Enums.BookingStatus.PendingPayment 
+                            && !x.PaymentReminderSent 
+                            && x.CreatedAt < reminderThreshold)
+                .ToListAsync(cancellationToken);
+        }
+
+        public async Task<IEnumerable<Booking>> GetRecentlyCancelledBookingsAsync(DateTime since, CancellationToken cancellationToken)
+        {
+            return await _context.Bookings
+                .Where(x => x.Status == Shared.Enums.BookingStatus.Cancelled 
+                            && x.CancelledAt != null 
+                            && x.CancelledAt >= since)
+                .ToListAsync(cancellationToken);
         }
 
         public Task UpdateAsync(Booking booking)

@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace BookingMS.Application.Queries.GetBookingsByUser
 {
-    public class GetBookingsByUserQueryHandler : IRequestHandler<GetBookingsByUserQuery, List<BookingDto>>
+    public class GetBookingsByUserQueryHandler : IRequestHandler<GetBookingsByUserQuery, Shared.Dtos.PagedResult<BookingDto>>
     {
         private readonly IBookingRepository _repository;
 
@@ -17,19 +17,24 @@ namespace BookingMS.Application.Queries.GetBookingsByUser
             _repository = repository;
         }
 
-        public async Task<List<BookingDto>> Handle(GetBookingsByUserQuery request, CancellationToken cancellationToken)
+        public async Task<Shared.Dtos.PagedResult<BookingDto>> Handle(GetBookingsByUserQuery request, CancellationToken cancellationToken)
         {
-            var bookings = await _repository.GetByUserIdAsync(request.UserId);
+            var (bookings, totalCount) = await _repository.GetPagedByUserIdAsync(request.UserId, request.Page, request.PageSize);
             
-            return bookings.Select(b => new BookingDto(
+            var items = bookings.Select(b => new BookingDto(
                 b.Id,
                 b.UserId,
                 b.EventId,
                 b.SeatIds.ToList(),
+                b.ServiceIds.ToList(),
                 b.TotalAmount,
                 b.Status,
-                b.CreatedAt
+                b.CreatedAt,
+                b.CouponCode,
+                b.DiscountAmount
             )).ToList();
+
+            return new Shared.Dtos.PagedResult<BookingDto>(items, totalCount, request.Page, request.PageSize);
         }
     }
 }

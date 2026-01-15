@@ -27,9 +27,12 @@ namespace BookingMS.Application.Queries.GetActiveBooking
                 booking.UserId,
                 booking.EventId,
                 booking.SeatIds.ToList(),
+                booking.ServiceIds.ToList(),
                 booking.TotalAmount,
                 booking.Status,
-                booking.CreatedAt
+                booking.CreatedAt,
+                booking.CouponCode,
+                booking.DiscountAmount
             );
         }
     }

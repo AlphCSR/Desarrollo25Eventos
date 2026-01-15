@@ -1,5 +1,6 @@
 using BookingMS.Shared.Enums;
 using BookingMS.Domain.Exceptions;
+using BookingMS.Domain.ValueObjects;
 using System;
 using System.Collections.Generic;
 
@@ -12,23 +13,38 @@ namespace BookingMS.Domain.Entities
         public Guid EventId { get; private set; }
         public DateTime CreatedAt { get; private set; }
         public BookingStatus Status { get; private set; }
-        public decimal TotalAmount { get; private set; }
+        public Money TotalAmount { get; private set; }
+        public Email Email { get; private set; }
+        public bool PaymentReminderSent { get; private set; } = false;
+        public string? CouponCode { get; private set; }
+        public Money DiscountAmount { get; private set; }
         
-        // Lista de IDs de los asientos reservados
         private readonly List<Guid> _seatIds = new();
         public IReadOnlyCollection<Guid> SeatIds => _seatIds.AsReadOnly();
 
-        protected Booking() { }
+        private readonly List<Guid> _serviceIds = new();
+        public IReadOnlyCollection<Guid> ServiceIds => _serviceIds.AsReadOnly();
 
-        public Booking(Guid userId, Guid eventId, List<Guid> seatIds, decimal totalAmount)
+        protected Booking() 
+        { 
+            TotalAmount = null!;
+            Email = null!;
+            DiscountAmount = null!;
+        }
+
+        public Booking(Guid userId, Guid eventId, List<Guid> seatIds, List<Guid> serviceIds, decimal totalAmount, string email, string? couponCode = null, decimal discountAmount = 0)
         {
             Id = Guid.NewGuid();
             UserId = userId;
             EventId = eventId;
             _seatIds.AddRange(seatIds);
-            TotalAmount = totalAmount;
+            if (serviceIds != null) _serviceIds.AddRange(serviceIds);
+            TotalAmount = (Money)totalAmount;
+            Email = (Email)email;
+            CouponCode = couponCode;
+            DiscountAmount = (Money)discountAmount;
             CreatedAt = DateTime.UtcNow;
-            Status = BookingStatus.PendingPayment; // Estado inicial
+            Status = BookingStatus.PendingPayment;
         }
 
         public void ConfirmPayment()
@@ -37,12 +53,20 @@ namespace BookingMS.Domain.Entities
             Status = BookingStatus.Confirmed;
         }
 
+        public void MarkReminderSent()
+        {
+            PaymentReminderSent = true;
+        }
+
+        public DateTime? CancelledAt { get; private set; }
+
         public void Cancel(string reason)
         {
-            if (Status == BookingStatus.Confirmed) 
-                throw new InvalidBookingStateException("No se puede cancelar una reserva ya pagada automáticamente.");
+            if (Status == BookingStatus.Cancelled) 
+                throw new InvalidBookingStateException("La reserva ya está cancelada.");
             
             Status = BookingStatus.Cancelled;
+            CancelledAt = DateTime.UtcNow;
         }
 
         public void RemoveSeat(Guid seatId)

@@ -8,7 +8,10 @@ public record BookingDto(
     Guid UserId,
     Guid EventId,
     List<Guid> SeatIds,
+    List<Guid> ServiceIds,
     decimal TotalAmount,
     BookingStatus Status,
-    DateTime CreatedAt
+    DateTime CreatedAt,
+    string? CouponCode = null,
+    decimal DiscountAmount = 0
 );

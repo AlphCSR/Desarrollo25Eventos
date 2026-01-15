@@ -30,11 +30,13 @@ namespace BookingMS.Infrastructure.Consumers
                 
                 _logger.LogWarning($"Reserva {bookingId} CANCELADA por fallo en pago.");
 
-                // Publicar evento de cancelación para que Seating libere los asientos
                 await context.Publish(new BookingCancelledEvent 
                 { 
                     BookingId = booking.Id,
-                    Reason = context.Message.Reason
+                    UserId = booking.UserId,
+                    SeatIds = booking.SeatIds.ToList(),
+                    Reason = context.Message.Reason,
+                    Email = booking.Email
                 });
             }
         }

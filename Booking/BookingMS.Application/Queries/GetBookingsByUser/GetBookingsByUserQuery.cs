@@ -5,5 +5,5 @@ using System.Collections.Generic;
 
 namespace BookingMS.Application.Queries.GetBookingsByUser
 {
-    public record GetBookingsByUserQuery(Guid UserId) : IRequest<List<BookingDto>>;
+    public record GetBookingsByUserQuery(Guid UserId, int Page, int PageSize) : IRequest<Shared.Dtos.PagedResult<BookingDto>>;
 }

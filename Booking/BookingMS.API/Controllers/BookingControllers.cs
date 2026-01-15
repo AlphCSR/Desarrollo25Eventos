@@ -1,5 +1,6 @@
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using BookingMS.Application.Commands.CreateBooking;
 using BookingMS.Shared.Dtos.Response;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace BookingMS.Controllers
 {
-    public record CreateBookingRequest(Guid UserId, Guid EventId, List<Guid> SeatIds, decimal TotalAmount);
+    public record CreateBookingRequest(Guid UserId, Guid EventId, List<Guid> SeatIds, List<Guid>? ServiceIds, decimal TotalAmount, string? UserEmail = null, string? CouponCode = null);
 
     [ExcludeFromCodeCoverage]
     [ApiController]
@@ -25,24 +26,33 @@ namespace BookingMS.Controllers
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] CreateBookingRequest request)
         {
-            // Aquí podrías validar que el Token JWT coincida con el UserId del request por seguridad
-            
-            var command = new CreateBookingCommand(request.UserId, request.EventId, request.SeatIds, request.TotalAmount);
+            var command = new CreateBookingCommand(
+                request.UserId, 
+                request.EventId, 
+                request.SeatIds, 
+                request.ServiceIds ?? new List<Guid>(), 
+                request.TotalAmount, 
+                request.UserEmail ?? "unknown@example.com",
+                request.CouponCode);
             var result = await _mediator.Send(command);
             
             return CreatedAtAction(nameof(Get), new { id = result.Id }, result);
         }
 
         [HttpGet("{id}")]
-        public IActionResult Get(Guid id)
+        public async Task<IActionResult> Get(Guid id)
         {
-            return Ok("Endpoint pendiente de implementar consulta (CQRS)");
+            var query = new Application.Queries.GetBookingById.GetBookingByIdQuery(id);
+            var result = await _mediator.Send(query);
+            if (result == null) return NotFound();
+            return Ok(result);
         }
 
         [HttpGet("user/{userId}")]
-        public async Task<IActionResult> GetBookingsByUser(Guid userId)
+
+        public async Task<IActionResult> GetBookingsByUser(Guid userId, [FromQuery] int page = 1, [FromQuery] int pageSize = 10)
         {
-            var query = new Application.Queries.GetBookingsByUser.GetBookingsByUserQuery(userId);
+            var query = new Application.Queries.GetBookingsByUser.GetBookingsByUserQuery(userId, page, pageSize);
             var result = await _mediator.Send(query);
             return Ok(result);
         }
@@ -58,10 +68,28 @@ namespace BookingMS.Controllers
         [HttpPost("pay/{id}")]
         public async Task<IActionResult> Pay(Guid id)
         {
-            var command = new Application.Commands.PayBooking.PayBookingCommand(id);
+            var language = Request.Headers["Accept-Language"].ToString().Split(',')[0].Trim().ToLower();
+            if (string.IsNullOrEmpty(language) || !language.StartsWith("en")) language = "es";
+            else language = "en";
+
+            var command = new Application.Commands.PayBooking.PayBookingCommand(id, language);
             var result = await _mediator.Send(command);
             if (!result) return NotFound("Reserva no encontrada");
             return Ok("Pago procesado exitosamente");
+        }
+
+        [Authorize]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Cancel(Guid id, [FromQuery] string reason = "User Cancelled")
+        {
+            var language = Request.Headers["Accept-Language"].ToString().Split(',')[0].Trim().ToLower();
+            if (string.IsNullOrEmpty(language) || !language.StartsWith("en")) language = "es";
+            else language = "en";
+
+            var command = new Application.Commands.CancelBooking.CancelBookingCommand(id, reason, language);
+            var result = await _mediator.Send(command);
+            if (!result) return NotFound("Reserva no encontrada");
+            return Ok("Reserva cancelada exitosamente");
         }
     }
 }
