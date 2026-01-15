@@ -10,6 +10,12 @@ namespace UsersMS.Infrastructure.Persistence
         {
         }
 
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.ConfigureWarnings(w => w.Ignore(Microsoft.EntityFrameworkCore.Diagnostics.RelationalEventId.PendingModelChangesWarning));
+            base.OnConfiguring(optionsBuilder);
+        }
+
         public DbSet<User> Users { get; set; }
         public DbSet<UserHistory> UserHistories { get; set; }
         

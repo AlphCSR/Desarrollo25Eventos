@@ -1,15 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="MassTransit.RabbitMQ" Version="8.5.7" />
+    <PackageReference Include="Minio" Version="7.0.0" />
     <ProjectReference Include="..\UsersMS.Application\UsersMS.Application.csproj" />
     <ProjectReference Include="..\UsersMS.Domain\UsersMS.Domain.csproj" />
     <ProjectReference Include="..\UsersMS.Shared\UsersMS.Shared.csproj" />
+    <ProjectReference Include="..\..\Events\EventsMS.Shared\EventsMS.Shared.csproj" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
     <PackageReference Include="MongoDB.Driver" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Abstractions" Version="9.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\Booking\BookingMS.Shared\BookingMS.Shared.csproj" />
+    <ProjectReference Include="..\..\Services\ServicesMS.Shared\ServicesMS.Shared.csproj" />
   </ItemGroup>
 
   <PropertyGroup>

@@ -18,7 +18,21 @@ namespace UsersMS.Application.Queries.GetAllUsers
         public async Task<IEnumerable<UserDto>> Handle(GetAllUsersQuery request, CancellationToken cancellationToken)
         {
             var users = await _repository.GetAllAsync(cancellationToken);
-            return users.Select(user => new UserDto(user.Id, user.FullName, user.Email, user.KeycloakId, user.Role, user.State));
+            return users.Select(user => new UserDto(
+                user.Id, 
+                user.FullName, 
+                user.Email, 
+                user.KeycloakId, 
+                user.Role, 
+                user.State, 
+                user.PhoneNumber, 
+                user.DocumentId, 
+                user.DateOfBirth, 
+                user.Address, 
+                user.ProfilePictureUrl,
+                user.Preferences ?? new List<string>(),
+                user.Language ?? "es"
+            ));
         }
     }
 }

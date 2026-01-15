@@ -6,7 +6,6 @@ using UsersMS.Domain.Interfaces;
 
 namespace UsersMS.Application.Queries.GetUserById
 {
-    // [ExcludeFromCodeCoverage]
     public class GetUserByIdQueryHandler : IRequestHandler<GetUserByIdQuery, UserDto?>
     {
         private readonly IUserRepository _repository;
@@ -21,7 +20,21 @@ namespace UsersMS.Application.Queries.GetUserById
             var user = await _repository.GetByIdAsync(request.UserId, cancellationToken);
             if (user == null) return null;
 
-            return new UserDto(user.Id, user.FullName, user.Email, user.KeycloakId, user.Role, user.State);
+            return new UserDto(
+                user.Id, 
+                user.FullName, 
+                user.Email, 
+                user.KeycloakId, 
+                user.Role, 
+                user.State, 
+                user.PhoneNumber, 
+                user.DocumentId, 
+                user.DateOfBirth, 
+                user.Address, 
+                user.ProfilePictureUrl,
+                user.Preferences ?? new List<string>(),
+                user.Language ?? "es"
+            );
         }
     }
 }
