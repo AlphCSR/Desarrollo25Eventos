@@ -2,10 +2,10 @@ using System;
 
 namespace SeatingMS.Domain.Exceptions
 {
-    public class SeatNotFoundException : Exception
+    public class SeatNotFoundException : DomainException
     {
         public SeatNotFoundException(Guid seatId) 
-            : base($"Seat with ID {seatId} was not found.")
+            : base($"El asiento con ID {seatId} no fue encontrado.")
         {
         }
     }

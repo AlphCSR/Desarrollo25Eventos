@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SeatingMS.Infrastructure.Persistence;
@@ -11,9 +12,11 @@ using SeatingMS.Infrastructure.Persistence;
 namespace SeatingMS.Infrastructure.Migrations
 {
     [DbContext(typeof(SeatingDbContext))]
-    partial class SeatingDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260104023722_AddUniqueIndexToSeats")]
+    partial class AddUniqueIndexToSeats
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -51,10 +54,6 @@ namespace SeatingMS.Infrastructure.Migrations
                     b.Property<int>("Status")
                         .IsConcurrencyToken()
                         .HasColumnType("integer");
-
-                    b.Property<Guid>("Version")
-                        .IsConcurrencyToken()
-                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
