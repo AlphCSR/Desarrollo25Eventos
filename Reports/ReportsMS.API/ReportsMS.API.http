@@ -1,0 +1,6 @@
+@ReportsMS.API_HostAddress = http://localhost:5166
+
+GET {{ReportsMS.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
