@@ -1,0 +1,29 @@
+Summary
+  Generated on: 1/15/2026 - 9:28:38 PM
+  Coverage date: 1/15/2026 - 9:28:35 PM
+  Parser: Cobertura
+  Assemblies: 2
+  Classes: 5
+  Files: 5
+  Line coverage: 36.8%
+  Covered lines: 73
+  Uncovered lines: 125
+  Coverable lines: 198
+  Total lines: 286
+  Branch coverage: 8% (5 of 62)
+  Covered branches: 5
+  Total branches: 62
+  Method coverage: 74% (20 of 27)
+  Full method coverage: 66.6% (18 of 27)
+  Covered methods: 20
+  Fully covered methods: 18
+  Total methods: 27
+
+InvoicingMS.Domain                                                73.3%
+  InvoicingMS.Domain.Entities.Invoice                             72.4%
+  InvoicingMS.Domain.ValueObjects.Email                           71.4%
+  InvoicingMS.Domain.ValueObjects.Money                           76.4%
+
+InvoicingMS.Infrastructure                                          21%
+  InvoicingMS.Infrastructure.Consumers.BookingConfirmedConsumer    100%
+  InvoicingMS.Infrastructure.Services.QuestPdfGenerator              0%
