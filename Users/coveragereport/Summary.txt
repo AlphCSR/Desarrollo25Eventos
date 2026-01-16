@@ -1,58 +1,89 @@
 Summary
-  Generated on: 11/27/2025 - 9:00:52 AM
-  Coverage date: 11/25/2025 - 10:38:50 PM - 11/27/2025 - 9:00:51 AM
-  Parser: MultiReport (15x Cobertura)
-  Assemblies: 3
-  Classes: 32
-  Files: 33
-  Line coverage: 66%
-  Covered lines: 581
-  Uncovered lines: 298
-  Coverable lines: 879
-  Total lines: 1509
-  Branch coverage: 60.1% (77 of 128)
-  Covered branches: 77
-  Total branches: 128
-  Method coverage: 90% (135 of 150)
-  Full method coverage: 81.3% (122 of 150)
-  Covered methods: 135
+  Generated on: 1/15/2026 - 9:00:06 PM
+  Coverage date: 1/15/2026 - 6:32:52 PM - 1/15/2026 - 9:00:03 PM
+  Parser: MultiReport (6x Cobertura)
+  Assemblies: 7
+  Classes: 55
+  Files: 54
+  Line coverage: 66.2%
+  Covered lines: 606
+  Uncovered lines: 309
+  Coverable lines: 915
+  Total lines: 1745
+  Branch coverage: 50.5% (100 of 198)
+  Covered branches: 100
+  Total branches: 198
+  Method coverage: 59.1% (129 of 218)
+  Full method coverage: 55.9% (122 of 218)
+  Covered methods: 129
   Fully covered methods: 122
-  Total methods: 150
+  Total methods: 218
 
-UsersMS.Application                                                                        84.5%
-  UsersMS.Application.Behaviors.AuditBehavior<T1, T2>                                      69.5%
-  UsersMS.Application.Commands.CreateUser.CreateUserCommand                                 100%
-  UsersMS.Application.Commands.CreateUser.CreateUserCommandHandler                          100%
-  UsersMS.Application.Commands.DeleteUser.DeleteUserCommand                                 100%
-  UsersMS.Application.Commands.DeleteUser.DeleteUserCommandHandler                          100%
-  UsersMS.Application.Commands.UpdateUser.UpdateUserCommand                                 100%
-  UsersMS.Application.Commands.UpdateUser.UpdateUserCommandHandler                          100%
-  UsersMS.Application.Commands.UpdateUserPreferences.UpdateUserPreferencesCommandHandler    100%
-  UsersMS.Application.Commands.UpdateUserPreferencesCommand                                 100%
-  UsersMS.Application.DTOs.UpdateUserPreferencesDto                                         100%
-  UsersMS.Application.Queries.GetAllUsers.GetAllUsersQuery                                    0%
-  UsersMS.Application.Queries.GetAllUsers.GetAllUsersQueryHandler                             0%
-  UsersMS.Application.Queries.GetUserByEmail.GetUserByEmailQuery                              0%
-  UsersMS.Application.Queries.GetUserByEmail.GetUserByEmailQueryHandler                    64.2%
-  UsersMS.Application.Queries.GetUserById.GetUserByIdQuery                                    0%
-  UsersMS.Application.Queries.GetUserById.GetUserByIdQueryHandler                          64.2%
+BookingMS.Shared                                                          31.8%
+  BookingMS.Shared.Dtos.PagedResult<T>                                       0%
+  BookingMS.Shared.Dtos.Response.BookingDto                                  0%
+  BookingMS.Shared.Dtos.Response.InvoiceItemDto                              0%
+  BookingMS.Shared.Events.BookingCancelledEvent                           87.5%
+  BookingMS.Shared.Events.BookingConfirmedEvent                           84.6%
+  BookingMS.Shared.Events.BookingCreatedEvent                              100%
+  BookingMS.Shared.Events.PaymentCapturedEvent                               0%
+  BookingMS.Shared.Events.PaymentExpiringSoonEvent                           0%
+  BookingMS.Shared.Events.PaymentFailedEvent                                 0%
 
-UsersMS.Domain                                                                             97.1%
-  UsersMS.Domain.Common.BaseEntity                                                          100%
-  UsersMS.Domain.Entities.AuditLog                                                          100%
-  UsersMS.Domain.Entities.User                                                             98.4%
-  UsersMS.Domain.Entities.UserHistory                                                       100%
-  UsersMS.Domain.Exceptions.InvalidUserDataException                                        100%
-  UsersMS.Domain.Exceptions.KeycloakIntegrationException                                    100%
-  UsersMS.Domain.Exceptions.UserAlreadyExistsException                                      100%
-  UsersMS.Domain.Exceptions.UserNotFoundException                                           100%
-  UsersMS.Domain.ValueObjects.Email                                                          88%
+EventsMS.Shared                                                              0%
+  EventsMS.Shared.Events.EventCancelledEvent                                 0%
+  EventsMS.Shared.Events.EventCreatedEvent                                   0%
+  EventsMS.Shared.Events.EventStatusChangedEvent                             0%
+  EventsMS.Shared.Events.EventUpdatedEvent                                   0%
+  EventsMS.Shared.Events.SectionDto                                          0%
 
-UsersMS.Infrastructure                                                                     47.3%
-  MongoAuditService                                                                        91.3%
-  UsersMS.Infrastructure.Migrations.InitialCreate                                             0%
-  UsersMS.Infrastructure.Migrations.UsersDbContextModelSnapshot                               0%
-  UsersMS.Infrastructure.Persistence.Configurations.UserConfiguration                        73%
-  UsersMS.Infrastructure.Persistence.UsersDbContext                                         100%
-  UsersMS.Infrastructure.Repositories.UserRepository                                        100%
-  UsersMS.Infrastructure.Services.KeycloakService                                          86.2%
+ServicesMS.Shared                                                            0%
+  ServicesMS.Shared.Events.ServiceBookedEvent                                0%
+
+UsersMS.Application                                                       89.7%
+  UsersMS.Application.Behaviors.AuditBehavior<T1, T2>                     66.1%
+  UsersMS.Application.Commands.CreateUser.CreateUserCommand                100%
+  UsersMS.Application.Commands.CreateUser.CreateUserCommandHandler          93%
+  UsersMS.Application.Commands.DeleteUser.DeleteUserCommand                100%
+  UsersMS.Application.Commands.DeleteUser.DeleteUserCommandHandler         100%
+  UsersMS.Application.Commands.UpdateUser.UpdateUserCommand                100%
+  UsersMS.Application.Commands.UpdateUser.UpdateUserCommandHandler        96.1%
+  UsersMS.Application.DTOs.UserHistoryDto                                  100%
+  UsersMS.Application.Queries.GetAuditLogsQuery                            100%
+  UsersMS.Application.Queries.GetAuditLogsQueryHandler                     100%
+  UsersMS.Application.Queries.GetUserByEmail.GetUserByEmailQueryHandler    100%
+  UsersMS.Application.Queries.GetUserById.GetUserByIdQueryHandler          100%
+  UsersMS.Application.Queries.GetUserHistory.GetUserHistoryQuery           100%
+  UsersMS.Application.Queries.GetUserHistory.GetUserHistoryQueryHandler    100%
+
+UsersMS.Domain                                                            98.6%
+  UsersMS.Domain.Common.BaseEntity                                         100%
+  UsersMS.Domain.Entities.AuditLog                                         100%
+  UsersMS.Domain.Entities.User                                             100%
+  UsersMS.Domain.Entities.UserHistory                                      100%
+  UsersMS.Domain.Exceptions.DomainException                                100%
+  UsersMS.Domain.Exceptions.InvalidUserDataException                       100%
+  UsersMS.Domain.Exceptions.KeycloakIntegrationException                   100%
+  UsersMS.Domain.Exceptions.UserAlreadyExistsException                     100%
+  UsersMS.Domain.Exceptions.UserNotFoundException                          100%
+  UsersMS.Domain.ValueObjects.Email                                        100%
+  UsersMS.Domain.ValueObjects.PersonName                                  92.8%
+  UsersMS.Domain.ValueObjects.PhoneNumber                                 92.8%
+
+UsersMS.Infrastructure                                                    48.3%
+  MongoAuditService                                                       57.1%
+  UsersMS.Infrastructure.Consumers.BookingCancelledConsumer                100%
+  UsersMS.Infrastructure.Consumers.BookingConfirmedConsumer                100%
+  UsersMS.Infrastructure.Consumers.BookingCreatedConsumer                  100%
+  UsersMS.Infrastructure.Consumers.EventCreatedConsumer                      0%
+  UsersMS.Infrastructure.Consumers.EventUpdatedConsumer                      0%
+  UsersMS.Infrastructure.Consumers.ServiceBookedConsumer                     0%
+  UsersMS.Infrastructure.Consumers.UserHistoryCreatedConsumer             78.4%
+  UsersMS.Infrastructure.Persistence.Configurations.UserConfiguration     84.2%
+  UsersMS.Infrastructure.Persistence.UsersDbContext                        100%
+  UsersMS.Infrastructure.Repositories.UserRepository                      87.8%
+  UsersMS.Infrastructure.Services.KeycloakService                            0%
+
+UsersMS.Shared                                                              30%
+  UsersMS.Shared.Events.UserHistoryCreatedEvent                            100%
+  UsersMS.Shared.Events.UserProfileUpdatedEvent                           22.2%

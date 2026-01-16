@@ -29,17 +29,17 @@ namespace UsersMS.Tests.Behaviors
         [Fact]
         public async Task Handle_ShouldLogSuccess_WhenNextDelegateSucceeds()
         {
-            // Arrange
+            
             var command = new TestCommand();
             var userId = "user-123";
             SetupHttpContext(userId);
 
             RequestHandlerDelegate<string> next = () => Task.FromResult("Success");
 
-            // Act
+            
             var result = await _behavior.Handle(command, next, CancellationToken.None);
 
-            // Assert
+            
             result.Should().Be("Success");
             _auditServiceMock.Verify(x => x.LogAsync(It.Is<AuditLog>(l => 
                 l.UserId == userId && 
@@ -52,7 +52,7 @@ namespace UsersMS.Tests.Behaviors
         [Fact]
         public async Task Handle_ShouldLogFailure_WhenNextDelegateThrows()
         {
-            // Arrange
+            
             var command = new TestCommand();
             var userId = "user-123";
             SetupHttpContext(userId);
@@ -60,10 +60,10 @@ namespace UsersMS.Tests.Behaviors
 
             RequestHandlerDelegate<string> next = () => throw exception;
 
-            // Act
+            
             Func<Task> act = async () => await _behavior.Handle(command, next, CancellationToken.None);
 
-            // Assert
+            
             await act.Should().ThrowAsync<Exception>().WithMessage("Something went wrong");
             _auditServiceMock.Verify(x => x.LogAsync(It.Is<AuditLog>(l => 
                 l.UserId == userId && 
@@ -76,50 +76,50 @@ namespace UsersMS.Tests.Behaviors
         [Fact]
         public async Task Handle_ShouldUseAnonymousUser_WhenHttpContextIsNull()
         {
-            // Arrange
+            
             var command = new TestCommand();
             _httpContextAccessorMock.Setup(x => x.HttpContext).Returns((HttpContext?)null);
 
             RequestHandlerDelegate<string> next = () => Task.FromResult("Success");
 
-            // Act
+            
             await _behavior.Handle(command, next, CancellationToken.None);
 
-            // Assert
+            
             _auditServiceMock.Verify(x => x.LogAsync(It.Is<AuditLog>(l => l.UserId == "Anonymous")), Times.Once);
         }
 
         [Fact]
         public async Task Handle_ShouldUseAnonymousUser_WhenUserPrincipalHasNoSubClaim()
         {
-            // Arrange
+            
             var command = new TestCommand();
             var context = new DefaultHttpContext();
-            var identity = new ClaimsIdentity(); // No claims
+            var identity = new ClaimsIdentity(); 
             context.User = new ClaimsPrincipal(identity);
             _httpContextAccessorMock.Setup(x => x.HttpContext).Returns(context);
 
             RequestHandlerDelegate<string> next = () => Task.FromResult("Success");
 
-            // Act
+            
             await _behavior.Handle(command, next, CancellationToken.None);
 
-            // Assert
+            
             _auditServiceMock.Verify(x => x.LogAsync(It.Is<AuditLog>(l => l.UserId == "Anonymous")), Times.Once);
         }
 
         [Fact]
         public async Task Handle_ShouldNotLog_WhenRequestIsNotCommand()
         {
-            // Arrange
+            
             var query = new TestQuery();
             var behavior = new AuditBehavior<TestQuery, string>(_auditServiceMock.Object, _httpContextAccessorMock.Object);
             RequestHandlerDelegate<string> next = () => Task.FromResult("Success");
 
-            // Act
+            
             await behavior.Handle(query, next, CancellationToken.None);
 
-            // Assert
+            
             _auditServiceMock.Verify(x => x.LogAsync(It.IsAny<AuditLog>()), Times.Never);
         }
 

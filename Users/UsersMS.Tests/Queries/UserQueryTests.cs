@@ -11,6 +11,9 @@ using UsersMS.Domain.Entities;
 using UsersMS.Domain.Exceptions;
 using UsersMS.Domain.Interfaces;
 using UsersMS.Shared.Enums;
+using UsersMS.Shared.Enums;
+using UsersMS.Application.Queries.GetUserHistory;
+using UsersMS.Application.DTOs;
 using Xunit;
 
 namespace UsersMS.Tests.Queries
@@ -27,7 +30,6 @@ namespace UsersMS.Tests.Queries
         [Fact]
         public async Task GetAllUsers_ShouldReturnAllUsers()
         {
-            // Arrange
             var users = new List<User>
             {
                 new User("User 1", "u1@test.com", "kc-1", UserRole.User),
@@ -38,10 +40,8 @@ namespace UsersMS.Tests.Queries
 
             var handler = new GetAllUsersQueryHandler(_userRepositoryMock.Object);
 
-            // Act
             var result = await handler.Handle(new GetAllUsersQuery(), CancellationToken.None);
 
-            // Assert
             result.Should().HaveCount(2);
             result.Should().Contain(u => u.Email == "u1@test.com");
             result.Should().Contain(u => u.Email == "u2@test.com");
@@ -52,7 +52,6 @@ namespace UsersMS.Tests.Queries
         [InlineData(false)]
         public async Task GetUserById_ShouldReturnExpectedResult(bool userExists)
         {
-            // Arrange
             var userId = Guid.NewGuid();
             var user = userExists ? new User("User 1", "u1@test.com", "kc-1", UserRole.User) : null;
 
@@ -61,10 +60,8 @@ namespace UsersMS.Tests.Queries
 
             var handler = new GetUserByIdQueryHandler(_userRepositoryMock.Object);
 
-            // Act
             var result = await handler.Handle(new GetUserByIdQuery(userId), CancellationToken.None);
 
-            // Assert
             if (userExists)
             {
                 result.Should().NotBeNull();
@@ -81,7 +78,6 @@ namespace UsersMS.Tests.Queries
         [InlineData(false)]
         public async Task GetUserByEmail_ShouldReturnExpectedResult(bool userExists)
         {
-            // Arrange
             var email = userExists ? "u1@test.com" : "unknown@test.com";
             var user = userExists ? new User("User 1", email, "kc-1", UserRole.User) : null;
             
@@ -90,7 +86,6 @@ namespace UsersMS.Tests.Queries
 
             var handler = new GetUserByEmailQueryHandler(_userRepositoryMock.Object);
 
-            // Act & Assert
             if (userExists)
             {
                 var result = await handler.Handle(new GetUserByEmailQuery(email), CancellationToken.None);
@@ -103,6 +98,36 @@ namespace UsersMS.Tests.Queries
                 await act.Should().ThrowAsync<UserNotFoundException>()
                     .WithMessage("User not found");
             }
+        }
+
+
+        [Fact]
+        public async Task GetUserHistory_ShouldReturnHistory_WhenUserExists()
+        {
+            var userId = Guid.NewGuid();
+            var user = new User("User with History", "hist@test.com", "kc-hist", UserRole.User);
+            
+            var historyItem1 = new UserHistory(userId, "UserCreated", "Usuario creado", DateTime.UtcNow);
+            var historyItem2 = new UserHistory(userId, "Login", "User logged in", DateTime.UtcNow);
+            
+            var historyField = typeof(User).GetField("_history", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+            if(historyField != null)
+            {
+                var list = (List<UserHistory>)historyField.GetValue(user);
+                list.Add(historyItem1);
+                list.Add(historyItem2);
+            }
+            
+            _userRepositoryMock.Setup(x => x.GetByIdAsync(userId, It.IsAny<CancellationToken>()))
+                .ReturnsAsync(user);
+
+            var handler = new GetUserHistoryQueryHandler(_userRepositoryMock.Object);
+
+            var result = await handler.Handle(new GetUserHistoryQuery(userId), CancellationToken.None);
+
+            result.Should().HaveCount(2);
+            result.Should().Contain(h => h.Action == "UserCreated");
+            result.Should().Contain(h => h.Action == "Login");
         }
     }
 }
