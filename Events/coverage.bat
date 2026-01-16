@@ -1,12 +1,17 @@
 @echo off
-echo Ejecutando tests y recolectando cobertura...
+echo Limpiando resultados anteriores...
+if exist EventsMS.Tests\TestResults rd /s /q EventsMS.Tests\TestResults
+if exist coveragereport rd /s /q coveragereport
+
+echo.
+echo Ejecutando tests y recolectando cobertura para EventsMS...
 dotnet test --collect:"XPlat Code Coverage" --settings coverlet.runsettings
 
 echo.
-echo Generando reporte de cobertura...
+echo Generando reporte de cobertura filtrado...
 reportgenerator -reports:"EventsMS.Tests\TestResults\**\coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:TextSummary
 
 echo.
-echo Reporte generado en EventsMS.Tests\coveragereport\UserSummary.txt
-type EventsMS.Tests\coveragereport\UserSummary.txt
+echo Reporte generado en coveragereport\Summary.txt
+if exist coveragereport\Summary.txt type coveragereport\Summary.txt
 pause
