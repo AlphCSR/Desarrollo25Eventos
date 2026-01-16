@@ -37,7 +37,7 @@ namespace UsersMS.Tests.Infrastructure.Services
         [Fact]
         public async Task LogAsync_ShouldInsertLogIntoCollection()
         {
-            // Arrange
+            
             var log = new AuditLog 
             { 
                 UserId = "User", 
@@ -45,10 +45,10 @@ namespace UsersMS.Tests.Infrastructure.Services
                 Payload = "Details" 
             };
 
-            // Act
+            
             await _service.LogAsync(log);
 
-            // Assert
+            
             _mongoCollectionMock.Verify(
                 c => c.InsertOneAsync(
                     log,

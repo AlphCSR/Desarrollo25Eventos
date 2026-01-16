@@ -22,25 +22,23 @@ namespace UsersMS.Tests.Handlers
         private readonly Mock<IUserRepository> _userRepositoryMock;
         private readonly Mock<IKeycloakService> _keycloakServiceMock;
         private readonly Mock<IAuditService> _auditServiceMock;
+        private readonly Mock<MassTransit.IPublishEndpoint> _publishEndpointMock;
 
         public UsersHandlerTests()
         {
             _userRepositoryMock = new Mock<IUserRepository>();
             _keycloakServiceMock = new Mock<IKeycloakService>();
             _auditServiceMock = new Mock<IAuditService>();
+            _publishEndpointMock = new Mock<MassTransit.IPublishEndpoint>();
         }
-
-        // =================================================================================================
-        // 1. CREATE USER
-        // =================================================================================================
 
         [Theory]
         [MemberData(nameof(GetCreateUserSuccessScenarios))]
         public async Task Handle_CreateUser_Success(string scenarioName, CreateUserDto dto)
         {
-            // ARRANGE
+            
             _userRepositoryMock.Setup(x => x.GetByEmailAsync(dto.Email, It.IsAny<CancellationToken>()))
-                .ReturnsAsync((User?)null); // No existe
+                .ReturnsAsync((User?)null); 
 
             _keycloakServiceMock.Setup(x => x.RegisterUserAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .ReturnsAsync("keycloak-id-123");
@@ -48,34 +46,35 @@ namespace UsersMS.Tests.Handlers
             _keycloakServiceMock.Setup(x => x.AssignRoleAsync(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()))
                 .Returns(Task.CompletedTask);
 
-            var handler = new CreateUserCommandHandler(_userRepositoryMock.Object, _keycloakServiceMock.Object);
+            var handler = new CreateUserCommandHandler(_userRepositoryMock.Object, _keycloakServiceMock.Object, _publishEndpointMock.Object);
             var command = new CreateUserCommand(dto);
 
-            // ACT
+            
             var result = await handler.Handle(command, CancellationToken.None);
 
-            // ASSERT
+            
             result.Should().NotBeEmpty();
             _userRepositoryMock.Verify(x => x.AddAsync(It.IsAny<User>(), It.IsAny<CancellationToken>()), Times.Once);
             _keycloakServiceMock.Verify(x => x.RegisterUserAsync(dto.Email, dto.Password, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
-            _keycloakServiceMock.Verify(x => x.AssignRoleAsync(dto.Email, dto.Role.ToString(), It.IsAny<CancellationToken>()), Times.Once);
+            _keycloakServiceMock.Verify(x => x.AssignRoleAsync(dto.Email, dto.Role.ToString().ToLower(), It.IsAny<CancellationToken>()), Times.Once);
+            _publishEndpointMock.Verify(x => x.Publish(It.IsAny<UsersMS.Shared.Events.UserHistoryCreatedEvent>(), It.IsAny<CancellationToken>()), Times.Once);
         }
 
         [Theory]
         [MemberData(nameof(GetCreateUserFailureScenarios))]
         public async Task Handle_CreateUser_Failure(string scenarioName, CreateUserDto dto, User? existingUserInDb, Type expectedExceptionType, string expectedErrorMessage)
         {
-            // ARRANGE
+            
             _userRepositoryMock.Setup(x => x.GetByEmailAsync(dto.Email, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(existingUserInDb);
 
-            var handler = new CreateUserCommandHandler(_userRepositoryMock.Object, _keycloakServiceMock.Object);
+            var handler = new CreateUserCommandHandler(_userRepositoryMock.Object, _keycloakServiceMock.Object, _publishEndpointMock.Object);
             var command = new CreateUserCommand(dto);
 
-            // ACT
+            
             Func<Task> act = async () => await handler.Handle(command, CancellationToken.None);
 
-            // ASSERT
+            
             await act.Should().ThrowAsync<Exception>()
                 .Where(e => e.GetType() == expectedExceptionType)
                 .WithMessage($"*{expectedErrorMessage}*");
@@ -104,27 +103,23 @@ namespace UsersMS.Tests.Handlers
             };
         }
 
-        // =================================================================================================
-        // 2. UPDATE USER
-        // =================================================================================================
-
         [Theory]
         [MemberData(nameof(GetUpdateUserSuccessScenarios))]
         public async Task Handle_UpdateUser_Success(string scenarioName, Guid targetId, User userFoundInDb, UpdateUserDto dto)
         {
-            // ARRANGE
+            
             _userRepositoryMock.Setup(x => x.GetByIdAsync(targetId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userFoundInDb);
 
-            var handler = new UpdateUserCommandHandler(_userRepositoryMock.Object, _keycloakServiceMock.Object, _auditServiceMock.Object);
+            var handler = new UpdateUserCommandHandler(_userRepositoryMock.Object, _keycloakServiceMock.Object, _auditServiceMock.Object, _publishEndpointMock.Object);
             var command = new UpdateUserCommand(targetId, dto);
 
-            // ACT
+            
             await handler.Handle(command, CancellationToken.None);
 
-            // ASSERT
+            
             _keycloakServiceMock.Verify(x => x.UpdateUserAsync(userFoundInDb.KeycloakId, It.IsAny<string>(), It.IsAny<string>(), It.IsAny<CancellationToken>()), Times.Once);
-            _userRepositoryMock.Verify(x => x.AddHistoryAsync(It.IsAny<UserHistory>(), It.IsAny<CancellationToken>()), Times.Once);
+             _publishEndpointMock.Verify(x => x.Publish(It.IsAny<UsersMS.Shared.Events.UserHistoryCreatedEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             _auditServiceMock.Verify(x => x.LogAsync(It.Is<AuditLog>(l => l.Action == "UpdateUser")), Times.Once);
         }
 
@@ -132,17 +127,17 @@ namespace UsersMS.Tests.Handlers
         [MemberData(nameof(GetUpdateUserFailureScenarios))]
         public async Task Handle_UpdateUser_Failure(string scenarioName, Guid targetId, UpdateUserDto dto, Type expectedExceptionType)
         {
-            // ARRANGE
+            
             _userRepositoryMock.Setup(x => x.GetByIdAsync(targetId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
 
-            var handler = new UpdateUserCommandHandler(_userRepositoryMock.Object, _keycloakServiceMock.Object, _auditServiceMock.Object);
+            var handler = new UpdateUserCommandHandler(_userRepositoryMock.Object, _keycloakServiceMock.Object, _auditServiceMock.Object, _publishEndpointMock.Object);
             var command = new UpdateUserCommand(targetId, dto);
 
-            // ACT
+            
             Func<Task> act = async () => await handler.Handle(command, CancellationToken.None);
 
-            // ASSERT
+            
             await act.Should().ThrowAsync<Exception>()
                .Where(e => e.GetType() == expectedExceptionType);
         }
@@ -172,28 +167,24 @@ namespace UsersMS.Tests.Handlers
             };
         }
 
-        // =================================================================================================
-        // 3. DELETE USER
-        // =================================================================================================
-
         [Theory]
         [MemberData(nameof(GetDeleteUserSuccessScenarios))]
         public async Task Handle_DeleteUser_Success(string scenarioName, Guid targetId, User userFoundInDb)
         {
-            // ARRANGE
+            
             _userRepositoryMock.Setup(x => x.GetByIdAsync(targetId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(userFoundInDb);
 
-            var handler = new DeleteUserCommandHandler(_userRepositoryMock.Object, _keycloakServiceMock.Object, _auditServiceMock.Object);
+            var handler = new DeleteUserCommandHandler(_userRepositoryMock.Object, _keycloakServiceMock.Object, _auditServiceMock.Object, _publishEndpointMock.Object);
             var command = new DeleteUserCommand(targetId);
 
-            // ACT
+            
             await handler.Handle(command, CancellationToken.None);
 
-            // ASSERT
+            
             _keycloakServiceMock.Verify(x => x.DeactivateUserAsync(userFoundInDb.KeycloakId, It.IsAny<CancellationToken>()), Times.Once);
             userFoundInDb.State.Should().Be(UserState.Inactive);
-            _userRepositoryMock.Verify(x => x.AddHistoryAsync(It.IsAny<UserHistory>(), It.IsAny<CancellationToken>()), Times.Once);
+            _publishEndpointMock.Verify(x => x.Publish(It.IsAny<UsersMS.Shared.Events.UserHistoryCreatedEvent>(), It.IsAny<CancellationToken>()), Times.Once);
             _auditServiceMock.Verify(x => x.LogAsync(It.Is<AuditLog>(l => l.Action == "DeleteUser")), Times.Once);
         }
 
@@ -201,17 +192,17 @@ namespace UsersMS.Tests.Handlers
         [MemberData(nameof(GetDeleteUserFailureScenarios))]
         public async Task Handle_DeleteUser_Failure(string scenarioName, Guid targetId, Type expectedExceptionType)
         {
-            // ARRANGE
+            
             _userRepositoryMock.Setup(x => x.GetByIdAsync(targetId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync((User?)null);
 
-            var handler = new DeleteUserCommandHandler(_userRepositoryMock.Object, _keycloakServiceMock.Object, _auditServiceMock.Object);
+            var handler = new DeleteUserCommandHandler(_userRepositoryMock.Object, _keycloakServiceMock.Object, _auditServiceMock.Object, _publishEndpointMock.Object);
             var command = new DeleteUserCommand(targetId);
 
-            // ACT
+            
             Func<Task> act = async () => await handler.Handle(command, CancellationToken.None);
 
-            // ASSERT
+            
             await act.Should().ThrowAsync<Exception>()
                .Where(e => e.GetType() == expectedExceptionType);
         }
