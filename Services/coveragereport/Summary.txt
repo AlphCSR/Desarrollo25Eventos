@@ -1,0 +1,43 @@
+Summary
+  Generated on: 1/15/2026 - 9:17:17 PM
+  Coverage date: 1/15/2026 - 9:17:15 PM
+  Parser: Cobertura
+  Assemblies: 3
+  Classes: 17
+  Files: 17
+  Line coverage: 45.6%
+  Covered lines: 122
+  Uncovered lines: 145
+  Coverable lines: 267
+  Total lines: 535
+  Branch coverage: 30.7% (16 of 52)
+  Covered branches: 16
+  Total branches: 52
+  Method coverage: 55.7% (34 of 61)
+  Full method coverage: 55.7% (34 of 61)
+  Covered methods: 34
+  Fully covered methods: 34
+  Total methods: 61
+
+ServicesMS.Application                                              39%
+  ServicesMS.Application.Behaviors.AuditBehavior<T1, T2>             0%
+  ServicesMS.Application.Commands.BookServiceCommand               100%
+  ServicesMS.Application.Commands.BookServiceCommandHandler        100%
+  ServicesMS.Application.Commands.CreateServiceCommand             100%
+  ServicesMS.Application.Commands.CreateServiceCommandHandler      100%
+  ServicesMS.Application.Queries.GetAuditLogsQuery                   0%
+  ServicesMS.Application.Queries.GetAuditLogsQueryHandler            0%
+  ServicesMS.Application.Queries.GetServiceByIdQuery                 0%
+  ServicesMS.Application.Queries.GetServiceByIdQueryHandler          0%
+  ServicesMS.Application.Queries.GetServicesByEventQuery           100%
+  ServicesMS.Application.Queries.GetServicesByEventQueryHandler    100%
+
+ServicesMS.Domain                                                 72.8%
+  ServicesMS.Domain.Entities.AuditLog                                0%
+  ServicesMS.Domain.Entities.ServiceBooking                       60.7%
+  ServicesMS.Domain.Entities.ServiceDefinition                      85%
+  ServicesMS.Domain.ValueObjects.Money                            94.1%
+
+ServicesMS.Infrastructure                                            0%
+  MongoAuditService                                                  0%
+  ServicesMS.Infrastructure.Consumers.BookingConfirmedConsumer       0%
