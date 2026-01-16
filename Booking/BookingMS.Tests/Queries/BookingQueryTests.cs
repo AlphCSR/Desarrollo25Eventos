@@ -4,6 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using BookingMS.Application.Queries.GetActiveBooking;
 using BookingMS.Application.Queries.GetBookingsByUser;
+using BookingMS.Shared.Dtos.Response;
 using BookingMS.Domain.Entities;
 using BookingMS.Domain.Interfaces;
 using BookingMS.Shared.Enums;
@@ -25,10 +26,10 @@ namespace BookingMS.Tests.Queries
         [Fact]
         public async Task Handle_GetActiveBooking_ShouldReturnBooking_WhenExists()
         {
-            // Arrange
+            
             var userId = Guid.NewGuid();
             var eventId = Guid.NewGuid();
-            var booking = new Booking(userId, eventId, new List<Guid>(), 100);
+            var booking = new Booking(userId, eventId, new List<Guid>(), new List<Guid>(), 100, "test@example.com");
             
             _repositoryMock.Setup(x => x.GetActiveByEventAsync(userId, eventId, It.IsAny<CancellationToken>()))
                 .ReturnsAsync(booking);
@@ -36,10 +37,10 @@ namespace BookingMS.Tests.Queries
             var handler = new GetActiveBookingQueryHandler(_repositoryMock.Object);
             var query = new GetActiveBookingQuery(userId, eventId);
 
-            // Act
+            
             var result = await handler.Handle(query, CancellationToken.None);
 
-            // Assert
+            
             result.Should().NotBeNull();
             result!.UserId.Should().Be(userId);
             result.EventId.Should().Be(eventId);
@@ -49,7 +50,7 @@ namespace BookingMS.Tests.Queries
         [Fact]
         public async Task Handle_GetActiveBooking_ShouldReturnNull_WhenNotExists()
         {
-            // Arrange
+            
             var userId = Guid.NewGuid();
             var eventId = Guid.NewGuid();
 
@@ -59,36 +60,36 @@ namespace BookingMS.Tests.Queries
             var handler = new GetActiveBookingQueryHandler(_repositoryMock.Object);
             var query = new GetActiveBookingQuery(userId, eventId);
 
-            // Act
+            
             var result = await handler.Handle(query, CancellationToken.None);
 
-            // Assert
+            
             result.Should().BeNull();
         }
 
         [Fact]
         public async Task Handle_GetBookingsByUser_ShouldReturnList()
         {
-            // Arrange
+            
             var userId = Guid.NewGuid();
             var bookings = new List<Booking>
             {
-                new Booking(userId, Guid.NewGuid(), new List<Guid>(), 100),
-                new Booking(userId, Guid.NewGuid(), new List<Guid>(), 200)
+                new Booking(userId, Guid.NewGuid(), new List<Guid>(), new List<Guid>(), 100, "test@example.com"),
+                new Booking(userId, Guid.NewGuid(), new List<Guid>(), new List<Guid>(), 200, "test2@example.com")
             };
 
-            _repositoryMock.Setup(x => x.GetByUserIdAsync(userId))
-                .ReturnsAsync(bookings);
+            _repositoryMock.Setup(x => x.GetPagedByUserIdAsync(userId, 1, 10))
+                .ReturnsAsync((bookings, bookings.Count));
 
             var handler = new GetBookingsByUserQueryHandler(_repositoryMock.Object);
-            var query = new GetBookingsByUserQuery(userId);
+            var query = new GetBookingsByUserQuery(userId, 1, 10);
 
-            // Act
+            
             var result = await handler.Handle(query, CancellationToken.None);
 
-            // Assert
-            result.Should().HaveCount(2);
-            result.Should().OnlyContain(b => b.UserId == userId);
+            
+            result.Items.Should().HaveCount(2);
+            result.Items.Should().AllSatisfy(b => b.UserId.Should().Be(userId));
         }
     }
 }

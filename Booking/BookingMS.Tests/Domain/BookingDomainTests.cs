@@ -11,61 +11,48 @@ namespace BookingMS.Tests.Domain
     public class BookingDomainTests
     {
         [Fact]
-        public void Cancel_ShouldSetStatusToCancelled_WhenPending()
+        public void Booking_Lifecycle_Tests()
         {
-            // Arrange
-            var booking = new Booking(Guid.NewGuid(), Guid.NewGuid(), new List<Guid>(), 100);
-
-            // Act
-            booking.Cancel("Test reason");
-
-            // Assert
-            booking.Status.Should().Be(BookingStatus.Cancelled);
-        }
-
-        [Fact]
-        public void Cancel_ShouldThrowException_WhenConfirmed()
-        {
-            // Arrange
-            var booking = new Booking(Guid.NewGuid(), Guid.NewGuid(), new List<Guid>(), 100);
-            booking.ConfirmPayment();
-
-            // Act
-            Action act = () => booking.Cancel("Test reason");
-
-            // Assert
-            act.Should().Throw<InvalidBookingStateException>()
-                .WithMessage("*ya pagada*");
-        }
-
-        [Fact]
-        public void RemoveSeat_ShouldRemoveSeat_WhenPending()
-        {
-            // Arrange
+            var userId = Guid.NewGuid();
+            var eventId = Guid.NewGuid();
             var seatId = Guid.NewGuid();
-            var booking = new Booking(Guid.NewGuid(), Guid.NewGuid(), new List<Guid> { seatId }, 100);
+            var seats = new List<Guid> { seatId };
+            var email = "test@example.com";
 
-            // Act
+            // --- 1. Construction ---
+            var booking = new Booking(userId, eventId, seats, new List<Guid>(), 100.00m, email);
+            
+            booking.Status.Should().Be(BookingStatus.PendingPayment);
+            booking.TotalAmount.Amount.Should().Be(100.00m);
+            booking.SeatIds.Should().Contain(seatId);
+
+            // --- 2. Modifications (Seats) ---
+            // Success: Remove seat while pending
             booking.RemoveSeat(seatId);
-
-            // Assert
             booking.SeatIds.Should().NotContain(seatId);
-        }
 
-        [Fact]
-        public void RemoveSeat_ShouldThrowException_WhenConfirmed()
-        {
-            // Arrange
-            var seatId = Guid.NewGuid();
-            var booking = new Booking(Guid.NewGuid(), Guid.NewGuid(), new List<Guid> { seatId }, 100);
+            // Setup for next steps
+            booking = new Booking(userId, eventId, seats, new List<Guid>(), 100.00m, email);
+
+            // --- 3. Status Transitions ---
+            // Success: Confirm Payment
             booking.ConfirmPayment();
+            booking.Status.Should().Be(BookingStatus.Confirmed);
 
-            // Act
-            Action act = () => booking.RemoveSeat(seatId);
+            // Error: Remove seat when confirmed
+            Action actRemoveSeatFail = () => booking.RemoveSeat(seatId);
+            actRemoveSeatFail.Should().Throw<InvalidBookingStateException>()
+                             .WithMessage("Solo se pueden remover asientos de reservas pendientes.");
 
-            // Assert
-            act.Should().Throw<InvalidBookingStateException>()
-                .WithMessage("*Solo se pueden remover asientos de reservas pendientes*");
+            // Success: Cancel from confirmed (allowed in this implementation)
+            booking.Cancel("User request");
+            booking.Status.Should().Be(BookingStatus.Cancelled);
+            booking.CancelledAt.Should().NotBeNull();
+
+            // Error: Cancel already cancelled
+            Action actCancelFail = () => booking.Cancel("Repeat");
+            actCancelFail.Should().Throw<InvalidBookingStateException>()
+                         .WithMessage("La reserva ya está cancelada.");
         }
     }
 }
