@@ -24,7 +24,7 @@ namespace SeatingMS.Tests.Queries
         [Fact]
         public async Task Handle_GetSeatsByEvent_Success()
         {
-            // Arrange
+            
             var eventId = Guid.NewGuid();
             var userId = Guid.NewGuid();
             var seats = new List<EventSeat>
@@ -33,7 +33,6 @@ namespace SeatingMS.Tests.Queries
                 new EventSeat(eventId, Guid.NewGuid(), "A", 2)
             };
             
-            // Lock one seat to test mapping
             seats[1].Lock(userId);
 
             _repositoryMock.Setup(x => x.GetByEventIdAsync(eventId, It.IsAny<CancellationToken>()))
@@ -42,14 +41,13 @@ namespace SeatingMS.Tests.Queries
             var handler = new GetSeatsByEventQueryHandler(_repositoryMock.Object);
             var query = new GetSeatsByEventQuery(eventId);
 
-            // Act
+            
             var result = await handler.Handle(query, CancellationToken.None);
 
-            // Assert
+            
             result.Should().HaveCount(2);
             result.First().Row.Should().Be("A");
             
-            // Verify UserId mapping
             var lockedSeatDto = result.FirstOrDefault(s => s.Row == "A" && s.Number == 2);
             lockedSeatDto.Should().NotBeNull();
             lockedSeatDto!.UserId.Should().Be(userId);

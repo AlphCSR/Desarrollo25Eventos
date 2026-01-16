@@ -26,7 +26,7 @@ namespace SeatingMS.Tests.Infrastructure.Repositories
         [Fact]
         public async Task AddRangeAsync_ShouldAddSeats()
         {
-            // Arrange
+            
             var seats = new List<EventSeat>
             {
                 new EventSeat(Guid.NewGuid(), Guid.NewGuid(), "A", 1),
@@ -36,11 +36,11 @@ namespace SeatingMS.Tests.Infrastructure.Repositories
             using var context = new SeatingDbContext(_dbOptions);
             var repository = new EventSeatRepository(context);
 
-            // Act
+            
             await repository.AddRangeAsync(seats, CancellationToken.None);
             await repository.SaveChangesAsync(CancellationToken.None);
 
-            // Assert
+            
             using var assertContext = new SeatingDbContext(_dbOptions);
             assertContext.EventSeats.Should().HaveCount(2);
         }
@@ -48,9 +48,8 @@ namespace SeatingMS.Tests.Infrastructure.Repositories
         [Fact]
         public async Task GetByIdAsync_ShouldReturnSeat_WhenExists()
         {
-            // Arrange
+            
             var seat = new EventSeat(Guid.NewGuid(), Guid.NewGuid(), "B", 1);
-            // Reflection to set ID
             var seatId = Guid.NewGuid();
             typeof(EventSeat).GetProperty("Id")?.SetValue(seat, seatId);
 
@@ -60,13 +59,13 @@ namespace SeatingMS.Tests.Infrastructure.Repositories
                 await context.SaveChangesAsync();
             }
 
-            // Act
+            
             using (var context = new SeatingDbContext(_dbOptions))
             {
                 var repository = new EventSeatRepository(context);
                 var result = await repository.GetByIdAsync(seatId, CancellationToken.None);
 
-                // Assert
+                
                 result.Should().NotBeNull();
                 result!.Row.Should().Be("B");
             }
@@ -75,7 +74,7 @@ namespace SeatingMS.Tests.Infrastructure.Repositories
         [Fact]
         public async Task GetByEventIdAsync_ShouldReturnSeatsForEvent()
         {
-            // Arrange
+            
             var eventId = Guid.NewGuid();
             var otherEventId = Guid.NewGuid();
             var seats = new List<EventSeat>
@@ -91,13 +90,13 @@ namespace SeatingMS.Tests.Infrastructure.Repositories
                 await context.SaveChangesAsync();
             }
 
-            // Act
+            
             using (var context = new SeatingDbContext(_dbOptions))
             {
                 var repository = new EventSeatRepository(context);
                 var result = await repository.GetByEventIdAsync(eventId, CancellationToken.None);
 
-                // Assert
+                
                 result.Should().HaveCount(2);
                 result.All(s => s.EventId == eventId).Should().BeTrue();
             }
@@ -106,7 +105,7 @@ namespace SeatingMS.Tests.Infrastructure.Repositories
         [Fact]
         public async Task UpdateAsync_ShouldUpdateSeat()
         {
-            // Arrange
+            
             var seat = new EventSeat(Guid.NewGuid(), Guid.NewGuid(), "E", 1);
             var seatId = Guid.NewGuid();
             typeof(EventSeat).GetProperty("Id")?.SetValue(seat, seatId);
@@ -117,7 +116,7 @@ namespace SeatingMS.Tests.Infrastructure.Repositories
                 await context.SaveChangesAsync();
             }
 
-            // Act
+            
             using (var context = new SeatingDbContext(_dbOptions))
             {
                 var repository = new EventSeatRepository(context);
@@ -127,7 +126,7 @@ namespace SeatingMS.Tests.Infrastructure.Repositories
                 await repository.SaveChangesAsync(CancellationToken.None);
             }
 
-            // Assert
+            
             using (var context = new SeatingDbContext(_dbOptions))
             {
                 var updatedSeat = await context.EventSeats.FindAsync(seatId);
