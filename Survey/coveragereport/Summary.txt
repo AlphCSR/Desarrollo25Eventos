@@ -1,0 +1,39 @@
+Summary
+  Generated on: 1/15/2026 - 9:03:17 PM
+  Coverage date: 1/15/2026 - 8:35:11 PM - 1/15/2026 - 9:03:16 PM
+  Parser: MultiReport (4x Cobertura)
+  Assemblies: 4
+  Classes: 11
+  Files: 8
+  Line coverage: 54.7%
+  Covered lines: 64
+  Uncovered lines: 53
+  Coverable lines: 117
+  Total lines: 258
+  Branch coverage: 100% (6 of 6)
+  Covered branches: 6
+  Total branches: 6
+  Method coverage: 60.5% (23 of 38)
+  Full method coverage: 60.5% (23 of 38)
+  Covered methods: 23
+  Fully covered methods: 23
+  Total methods: 38
+
+SurveyMS.API                                                                      0%
+  SurveyMS.API.Controllers.FeedbacksController                                    0%
+
+SurveyMS.Application                                                           74.3%
+  SurveyMS.Application.Commands.SubmitFeedback.SubmitFeedbackCommand            100%
+  SurveyMS.Application.Commands.SubmitFeedback.SubmitFeedbackCommandHandler     100%
+  SurveyMS.Application.Queries.GetEventFeedback.FeedbackDto                       0%
+  SurveyMS.Application.Queries.GetEventFeedback.GetEventFeedbackQuery             0%
+  SurveyMS.Application.Queries.GetEventFeedback.GetEventFeedbackQueryHandler      0%
+
+SurveyMS.Domain                                                                81.3%
+  SurveyMS.Domain.Entities.Feedback                                              76%
+  SurveyMS.Domain.Exceptions.DomainException                                    100%
+  SurveyMS.Domain.Exceptions.InvalidSurveyDataException                         100%
+  SurveyMS.Domain.ValueObjects.Rating                                          83.3%
+
+SurveyMS.Infrastructure                                                           0%
+  SurveyMS.Infrastructure.Repositories.FeedbackRepository                         0%
