@@ -1,0 +1,47 @@
+Summary
+  Generated on: 1/15/2026 - 9:32:08 PM
+  Coverage date: 1/15/2026 - 9:32:05 PM
+  Parser: Cobertura
+  Assemblies: 3
+  Classes: 21
+  Files: 21
+  Line coverage: 37%
+  Covered lines: 135
+  Uncovered lines: 229
+  Coverable lines: 364
+  Total lines: 732
+  Branch coverage: 17.5% (13 of 74)
+  Covered branches: 13
+  Total branches: 74
+  Method coverage: 58.9% (43 of 73)
+  Full method coverage: 53.4% (39 of 73)
+  Covered methods: 43
+  Fully covered methods: 39
+  Total methods: 73
+
+ReportsMS.Application                                                43.1%
+  ReportsMS.Application.Behaviors.AuditBehavior<T1, T2>                 0%
+  ReportsMS.Application.Queries.GetAuditLogsQuery                       0%
+  ReportsMS.Application.Queries.GetAuditLogsQueryHandler                0%
+  ReportsMS.Application.Queries.GetDashboardMetricsQueryHandler       100%
+  ReportsMS.Application.Queries.GetEventDetailedReportQuery           100%
+  ReportsMS.Application.Queries.GetEventDetailedReportQueryHandler   92.3%
+  ReportsMS.Application.Queries.GetLiveReportQuery                   33.3%
+  ReportsMS.Application.Queries.GetLiveReportQueryHandler            83.3%
+  ReportsMS.Application.Queries.GetSalesReportQuery                   100%
+  ReportsMS.Application.Queries.GetSalesReportQueryHandler            100%
+
+ReportsMS.Domain                                                     80.8%
+  ReportsMS.Domain.Entities.AuditLog                                    0%
+  ReportsMS.Domain.Entities.DashboardMetric                           100%
+  ReportsMS.Domain.Entities.EventStats                                100%
+  ReportsMS.Domain.Entities.SalesRecord                              77.2%
+  ReportsMS.Domain.ValueObjects.Email                                78.5%
+  ReportsMS.Domain.ValueObjects.Money                                86.6%
+
+ReportsMS.Infrastructure                                                0%
+  ReportsMS.Infrastructure.BackgroundJobs.MetricsAggregationWorker      0%
+  ReportsMS.Infrastructure.Consumers.EventCreatedConsumer               0%
+  ReportsMS.Infrastructure.Consumers.SalesRecordingConsumer             0%
+  ReportsMS.Infrastructure.Services.CsvExportService                    0%
+  ReportsMS.Infrastructure.Services.MongoAuditService                   0%
