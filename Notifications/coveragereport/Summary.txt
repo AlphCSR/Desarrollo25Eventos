@@ -1,0 +1,31 @@
+Summary
+  Generated on: 1/15/2026 - 9:35:48 PM
+  Coverage date: 1/15/2026 - 9:35:45 PM
+  Parser: Cobertura
+  Assemblies: 1
+  Classes: 9
+  Files: 9
+  Line coverage: 86.3%
+  Covered lines: 146
+  Uncovered lines: 23
+  Coverable lines: 169
+  Total lines: 341
+  Branch coverage: 68.7% (11 of 16)
+  Covered branches: 11
+  Total branches: 16
+  Method coverage: 89.4% (17 of 19)
+  Full method coverage: 84.2% (16 of 19)
+  Covered methods: 17
+  Fully covered methods: 16
+  Total methods: 19
+
+NotificationsMS.Infrastructure                                           86.3%
+  NotificationsMS.Infrastructure.Consumers.BookingCancelledConsumer       100%
+  NotificationsMS.Infrastructure.Consumers.BookingConfirmedConsumer      76.4%
+  NotificationsMS.Infrastructure.Consumers.EventCancelledConsumer         100%
+  NotificationsMS.Infrastructure.Consumers.EventStatusChangedConsumer     100%
+  NotificationsMS.Infrastructure.Consumers.PaymentExpiringSoonConsumer    100%
+  NotificationsMS.Infrastructure.Consumers.PaymentFailedConsumer          100%
+  NotificationsMS.Infrastructure.Consumers.SeatStatusUpdatedConsumer        0%
+  NotificationsMS.Infrastructure.Consumers.ServiceBookedConsumer          100%
+  NotificationsMS.Infrastructure.Services.EmailTemplateService            100%
