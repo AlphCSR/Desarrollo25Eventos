@@ -1,0 +1,44 @@
+Summary
+  Generated on: 1/15/2026 - 9:24:25 PM
+  Coverage date: 1/15/2026 - 9:24:23 PM
+  Parser: Cobertura
+  Assemblies: 3
+  Classes: 18
+  Files: 18
+  Line coverage: 32.6%
+  Covered lines: 102
+  Uncovered lines: 210
+  Coverable lines: 312
+  Total lines: 614
+  Branch coverage: 17.1% (12 of 70)
+  Covered branches: 12
+  Total branches: 70
+  Method coverage: 49.1% (30 of 61)
+  Full method coverage: 49.1% (30 of 61)
+  Covered methods: 30
+  Fully covered methods: 30
+  Total methods: 61
+
+PaymentsMS.Application                                                              28.4%
+  PaymentsMS.Application.Behaviors.AuditBehavior<T1, T2>                               0%
+  PaymentsMS.Application.Commands.CapturePayment.CapturePaymentCommand               100%
+  PaymentsMS.Application.Commands.CapturePayment.CapturePaymentCommandHandler        100%
+  PaymentsMS.Application.Commands.CreatePayment.CreatePaymentIntentCommand           100%
+  PaymentsMS.Application.Commands.CreatePayment.CreatePaymentIntentCommandHandler    100%
+  PaymentsMS.Application.Commands.FailPayment.FailPaymentCommand                       0%
+  PaymentsMS.Application.Commands.FailPayment.FailPaymentCommandHandler                0%
+  PaymentsMS.Application.Queries.GetAuditLogsQuery                                     0%
+  PaymentsMS.Application.Queries.GetAuditLogsQueryHandler                              0%
+
+PaymentsMS.Domain                                                                   79.7%
+  PaymentsMS.Domain.Entities.AuditLog                                                  0%
+  PaymentsMS.Domain.Entities.Payment                                                  85%
+  PaymentsMS.Domain.Models.GatewayPaymentIntent                                      100%
+  PaymentsMS.Domain.ValueObjects.Email                                              92.8%
+  PaymentsMS.Domain.ValueObjects.Money                                              88.2%
+
+PaymentsMS.Infrastructure                                                              0%
+  MongoAuditService                                                                    0%
+  PaymentsMS.Infrastructure.BackgroundJobs.ReconciliationWorker                        0%
+  PaymentsMS.Infrastructure.Consumers.BookingCancelledConsumer                         0%
+  PaymentsMS.Infrastructure.Consumers.BookingCreatedConsumer                           0%
