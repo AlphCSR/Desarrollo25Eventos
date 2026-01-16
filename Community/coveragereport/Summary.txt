@@ -1,0 +1,42 @@
+Summary
+  Generated on: 1/15/2026 - 9:03:01 PM
+  Coverage date: 1/15/2026 - 8:34:54 PM - 1/15/2026 - 9:02:59 PM
+  Parser: MultiReport (4x Cobertura)
+  Assemblies: 4
+  Classes: 14
+  Files: 14
+  Line coverage: 52.5%
+  Covered lines: 102
+  Uncovered lines: 92
+  Coverable lines: 194
+  Total lines: 411
+  Branch coverage: 66.6% (4 of 6)
+  Covered branches: 4
+  Total branches: 6
+  Method coverage: 65.6% (42 of 64)
+  Full method coverage: 64% (41 of 64)
+  Covered methods: 42
+  Fully covered methods: 41
+  Total methods: 64
+
+CommunityMS.API                                                        0%
+  CommunityMS.API.Controllers.ForumController                          0%
+
+CommunityMS.Application                                             62.1%
+  CommunityMS.Application.Commands.AddPostCommand                    100%
+  CommunityMS.Application.Commands.AddPostCommandHandler             100%
+  CommunityMS.Application.Commands.CreateThreadCommand               100%
+  CommunityMS.Application.Commands.CreateThreadCommandHandler        100%
+  CommunityMS.Application.Queries.GetThreadByIdQuery                   0%
+  CommunityMS.Application.Queries.GetThreadByIdQueryHandler            0%
+  CommunityMS.Application.Queries.GetThreadsByEventIdQuery             0%
+  CommunityMS.Application.Queries.GetThreadsByEventIdQueryHandler      0%
+
+CommunityMS.Domain                                                  83.5%
+  CommunityMS.Domain.Entities.ForumPost                             79.1%
+  CommunityMS.Domain.Entities.ForumThread                           83.7%
+  CommunityMS.Domain.Exceptions.DomainException                      100%
+  CommunityMS.Domain.Exceptions.ThreadLockedException                100%
+
+CommunityMS.Infrastructure                                             0%
+  CommunityMS.Infrastructure.Repositories.ForumRepository              0%
