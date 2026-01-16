@@ -5,9 +5,20 @@
       <DataCollector friendlyName="XPlat code coverage">
         <Configuration>
           <Format>cobertura</Format>
-          <Exclude>[*.Tests]*,[EventsMS.Infrastructure]EventsMS.Infrastructure.Migrations*,[EventsMS.API]EventsMS.API.Program,[EventsMS.Application]EventsMS.Application.DependencyInjection</Exclude>
+          <Exclude>
+            [*.Tests]*,
+            [*MS.API]*,
+            [*MS.Shared]*,
+            [*MS.Infrastructure]*Migrations*,
+            [*MS.Infrastructure]*Persistence*,
+            [*MS.Infrastructure]*Repositories*,
+            [*MS.Infrastructure]*Gateways*,
+            [*MS.Infrastructure]*SendGrid*,
+            [*MS.Domain]*Exceptions*,
+            [*MS.Application]*DTOs*,
+            [*MS.Application]*Dtos*
+          </Exclude>
           <ExcludeByAttribute>ExcludeFromCodeCoverageAttribute</ExcludeByAttribute>
-          <ExcludeByFile>**/Program.cs,**/DependencyInjection.cs</ExcludeByFile>
         </Configuration>
       </DataCollector>
     </DataCollectors>
