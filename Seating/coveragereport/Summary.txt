@@ -1,36 +1,47 @@
 Summary
-  Generated on: 11/28/2025 - 10:56:09 PM
-  Coverage date: 11/28/2025 - 10:56:07 PM
+  Generated on: 1/15/2026 - 9:22:11 PM
+  Coverage date: 1/15/2026 - 9:22:09 PM
   Parser: Cobertura
   Assemblies: 3
-  Classes: 10
-  Files: 10
-  Line coverage: 99.1%
-  Covered lines: 119
-  Uncovered lines: 1
-  Coverable lines: 120
-  Total lines: 272
-  Branch coverage: 83.3% (10 of 12)
-  Covered branches: 10
-  Total branches: 12
-  Method coverage: 100% (32 of 32)
-  Full method coverage: 96.8% (31 of 32)
-  Covered methods: 32
-  Fully covered methods: 31
-  Total methods: 32
+  Classes: 21
+  Files: 21
+  Line coverage: 42.7%
+  Covered lines: 202
+  Uncovered lines: 271
+  Coverable lines: 473
+  Total lines: 889
+  Branch coverage: 27.9% (38 of 136)
+  Covered branches: 38
+  Total branches: 136
+  Method coverage: 47.5% (29 of 61)
+  Full method coverage: 42.6% (26 of 61)
+  Covered methods: 29
+  Fully covered methods: 26
+  Total methods: 61
 
-SeatingMS.Application                                                          100%
+SeatingMS.Application                                                         38.3%
+  SeatingMS.Application.Behaviors.AuditBehavior<T1, T2>                          0%
   SeatingMS.Application.Commands.LockSeat.LockSeatCommand                      100%
-  SeatingMS.Application.Commands.LockSeat.LockSeatCommandHandler               100%
+  SeatingMS.Application.Commands.LockSeat.LockSeatCommandHandler              88.4%
   SeatingMS.Application.Commands.UnlockSeat.UnlockSeatCommand                  100%
-  SeatingMS.Application.Commands.UnlockSeat.UnlockSeatCommandHandler           100%
+  SeatingMS.Application.Commands.UnlockSeat.UnlockSeatCommandHandler          90.3%
+  SeatingMS.Application.Queries.GetAuditLogsQuery                                0%
+  SeatingMS.Application.Queries.GetAuditLogsQueryHandler                         0%
+  SeatingMS.Application.Queries.GetSeatById.GetSeatByIdQuery                     0%
+  SeatingMS.Application.Queries.GetSeatById.GetSeatByIdQueryHandler              0%
   SeatingMS.Application.Queries.GetSeatsByEvent.GetSeatsByEventQuery           100%
   SeatingMS.Application.Queries.GetSeatsByEvent.GetSeatsByEventQueryHandler    100%
+  SeatingMS.Application.Queries.ValidateLock.ValidateLockQuery                   0%
+  SeatingMS.Application.Queries.ValidateLock.ValidateLockQueryHandler            0%
 
-SeatingMS.Domain                                                              97.6%
-  SeatingMS.Domain.Entities.EventSeat                                         97.2%
-  SeatingMS.Domain.Exceptions.SeatNotAvailableException                        100%
-  SeatingMS.Domain.Exceptions.SeatNotFoundException                            100%
+SeatingMS.Domain                                                              86.2%
+  SeatingMS.Domain.Entities.AuditLog                                             0%
+  SeatingMS.Domain.Entities.EventSeat                                          100%
 
-SeatingMS.Infrastructure                                                       100%
-  SeatingMS.Infrastructure.Repositories.EventSeatRepository                    100%
+SeatingMS.Infrastructure                                                      36.6%
+  MongoAuditService                                                              0%
+  SeatingMS.Infrastructure.BackgroundJobs.SeatLockExpirationWorker               0%
+  SeatingMS.Infrastructure.Consumers.BookingCancelledConsumer                    0%
+  SeatingMS.Infrastructure.Consumers.BookingConfirmedConsumer                  100%
+  SeatingMS.Infrastructure.Consumers.EventCreatedConsumer                     89.2%
+  SeatingMS.Infrastructure.Consumers.EventStatusChangedConsumer                  0%
