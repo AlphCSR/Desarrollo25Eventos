@@ -1,0 +1,52 @@
+Summary
+  Generated on: 1/15/2026 - 9:02:08 PM
+  Coverage date: 1/15/2026 - 8:40:54 PM - 1/15/2026 - 9:02:07 PM
+  Parser: MultiReport (4x Cobertura)
+  Assemblies: 4
+  Classes: 24
+  Files: 22
+  Line coverage: 42.8%
+  Covered lines: 167
+  Uncovered lines: 223
+  Coverable lines: 390
+  Total lines: 789
+  Branch coverage: 35.3% (29 of 82)
+  Covered branches: 29
+  Total branches: 82
+  Method coverage: 53.3% (48 of 90)
+  Full method coverage: 52.2% (47 of 90)
+  Covered methods: 48
+  Fully covered methods: 47
+  Total methods: 90
+
+MarketingMS.API                                                                          0%
+  MarketingMS.API.Controllers.CouponsController                                          0%
+  MarketingMS.API.Controllers.RecommendationsController                                  0%
+
+MarketingMS.Application                                                               71.7%
+  MarketingMS.Application.Commands.CreateCoupon.CreateCouponCommand                    100%
+  MarketingMS.Application.Commands.CreateCoupon.CreateCouponCommandHandler             100%
+  MarketingMS.Application.Commands.DeleteCoupon.DeleteCouponCommand                    100%
+  MarketingMS.Application.Commands.DeleteCoupon.DeleteCouponCommandHandler             100%
+  MarketingMS.Application.Interfaces.EventDetailsDto                                    60%
+  MarketingMS.Application.Interfaces.PagedResult<T>                                      0%
+  MarketingMS.Application.Queries.GetAllCoupons.GetAllCouponsQuery                     100%
+  MarketingMS.Application.Queries.GetAllCoupons.GetAllCouponsQueryHandler              100%
+  MarketingMS.Application.Queries.GetRecommendations.GetRecommendationsQuery           100%
+  MarketingMS.Application.Queries.GetRecommendations.GetRecommendationsQueryHandler   93.1%
+  MarketingMS.Application.Queries.ValidateCoupon.ValidateCouponQuery                     0%
+  MarketingMS.Application.Queries.ValidateCoupon.ValidateCouponQueryHandler              0%
+
+MarketingMS.Domain                                                                    92.4%
+  MarketingMS.Domain.Entities.Coupon                                                  89.7%
+  MarketingMS.Domain.Entities.UserInterest                                             100%
+  MarketingMS.Domain.Exceptions.DomainException                                        100%
+  MarketingMS.Domain.Exceptions.InvalidMarketingDataException                          100%
+  MarketingMS.Domain.ValueObjects.CouponCode                                          84.6%
+
+MarketingMS.Infrastructure                                                               0%
+  MarketingMS.Infrastructure.Consumers.BookingConfirmedConsumer                          0%
+  MarketingMS.Infrastructure.Consumers.UserProfileUpdatedConsumer                        0%
+  MarketingMS.Infrastructure.Repositories.CouponRepository                               0%
+  MarketingMS.Infrastructure.Repositories.UserInterestRepository                         0%
+  MarketingMS.Infrastructure.Services.EventsService                                      0%
